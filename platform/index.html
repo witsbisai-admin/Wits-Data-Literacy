@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Wits Data Literacy Platform — Data Champions</title>
@@ -934,6 +935,14 @@ input,textarea,select{font-family:inherit}
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 
 <script>
+
+// 1. Initialize Supabase (Replace with your actual keys from Supabase Dashboard)
+const supabaseUrl = 'https://zlzwwhepyoeeaflpgrwp.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpsend3aGVweW9lZWFmbHBncndwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyNTkxNjksImV4cCI6MjA4OTgzNTE2OX0.QCgn4YPDrKUUfsbepvpsLbJ6UR5NExCgxSeJX54Hbz0';
+const _supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+let currentUser = null; // Track the logged-in user globally
+
 // ═══════════════════════════════════════
 // DATA: ALL 6 UNITS
 // ═══════════════════════════════════════
@@ -1677,20 +1686,28 @@ let state = {
 // saveState — per-user version below
 // loadState — per-user version below INIT
 // ══════════════════════════════════════
-function init(){
-  loadState();
+async function init(){
+  // 1. Get the current session from Supabase
+  const { data: { session } } = await _supabase.auth.getSession();
+  
+  if (session) {
+    currentUser = session.user;
+    await applyUser(currentUser); // This will call loadState() internally
+  }
+
   loadProfile();
   buildUnitsGrid();
   buildNavBadges();
   buildReferences();
   updateProgress();
   autoCertNo();
+  
   const today = new Date().toISOString().split('T')[0];
-  document.getElementById('cf-date').value = today;
+  if(document.getElementById('cf-date')) document.getElementById('cf-date').value = today;
+  
   fillFromProfile();
   renderCert();
 }
-
 // ══════════════════════════════════════
 // VIEWS
 // ══════════════════════════════════════
@@ -2232,21 +2249,6 @@ function showToast(msg){
 // ══════════════════════════════════════
 // AUTH SYSTEM
 // ══════════════════════════════════════
-const ACCOUNTS_KEY = 'wits_dc_accounts';
-const SESSION_KEY  = 'wits_dc_session';
-
-function getAccounts(){
-// get db
-  const a = localStorage.getItem(ACCOUNTS_KEY);
-  return a ? JSON.parse(a) : {};
-}
-function saveAccounts(accts){ localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accts)); }
-
-function getCurrentUser(){
-  const s = sessionStorage.getItem(SESSION_KEY);
-  return s ? JSON.parse(s) : null;
-}
-
 function switchAuthTab(tab, el){
   document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
@@ -2256,46 +2258,119 @@ function switchAuthTab(tab, el){
   document.getElementById('register-form').style.flexDirection='column';
 }
 
-function doLogin(){
+async function doLogin() {
   const email = document.getElementById('li-email').value.trim().toLowerCase();
-  const pass  = document.getElementById('li-pass').value;
-  const err   = document.getElementById('login-err');
-  const accts = getAccounts();
-  if(accts[email] && accts[email].password===pass){
-    const u = accts[email];
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(u));
-    hideSplash(u);
-  } else {
+  const pass = document.getElementById('li-pass').value;
+  const err = document.getElementById('login-err');
+
+  // 1. Clear previous errors
+  err.classList.remove('show');
+
+  // 2. Supabase Auth Sign In
+  const { data, error } = await _supabase.auth.signInWithPassword({
+    email: email,
+    password: pass,
+  });
+
+  if (error) {
+    // Customize error message for better user experience
+    err.textContent = "Invalid email or password. Please check your credentials.";
     err.classList.add('show');
-    setTimeout(()=>err.classList.remove('show'),3000);
+    setTimeout(() => err.classList.remove('show'), 4000);
+    return;
+  }
+
+  // 3. Handle successful login
+  if (data.user) {
+    currentUser = data.user;
+    
+    // Persist session in local browser storage so refreshes don't log them out
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
+    
+    // 4. Important: Wait for user metadata and progress to load before hiding splash
+    await applyUser(currentUser);
+    
+    hideSplash(currentUser);
+    showToast("Welcome back!");
   }
 }
 
-function doRegister(){
-  const name    = document.getElementById('rg-name').value.trim();
-  const email   = document.getElementById('rg-email').value.trim().toLowerCase();
-  const role    = document.getElementById('rg-role').value.trim();
+async function doRegister() {
+  const name = document.getElementById('rg-name').value.trim();
+  const email = document.getElementById('rg-email').value.trim().toLowerCase();
+  const role = document.getElementById('rg-role').value.trim();
   const faculty = document.getElementById('rg-faculty').value.trim();
-  const pass    = document.getElementById('rg-pass').value;
-  const err     = document.getElementById('register-err');
-  if(!name||!email||!pass||pass.length<6){ err.textContent='Please fill all fields. Password min 6 chars.'; err.classList.add('show'); setTimeout(()=>err.classList.remove('show'),3000); return; }
-  const accts = getAccounts();
-  if(accts[email]){ err.textContent='An account with this email already exists.'; err.classList.add('show'); setTimeout(()=>err.classList.remove('show'),3000); return; }
-  const user = {name,email,role,faculty,password:pass,stateKey:'wits_dc_state_'+email.replace(/[^a-z0-9]/g,'_')};
-  accts[email] = user;
-  saveAccounts(accts);
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
-  hideSplash(user);
-}
+  const pass = document.getElementById('rg-pass').value;
+  const err = document.getElementById('register-err');
 
-function demoLogin(name,role,faculty,email){
-  const accts = getAccounts();
-  if(!accts[email]){
-    const user = {name,email,role,faculty,password:'demo123',stateKey:'wits_dc_state_'+email.replace(/[^a-z0-9]/g,'_')};
-    accts[email]=user; saveAccounts(accts);
+  // 1. Basic Validation
+  if (!name || !email || !pass || pass.length < 6) {
+    err.textContent = 'Please fill in all fields. Password must be at least 6 characters.';
+    err.classList.add('show');
+    setTimeout(() => err.classList.remove('show'), 4000);
+    return;
   }
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify(accts[email]));
-  hideSplash(accts[email]);
+
+  // 2. Supabase Auth Signup
+  // We include name, role, and faculty in the user_metadata for easy access
+  const { data, error } = await _supabase.auth.signUp({
+    email: email,
+    password: pass,
+    options: {
+      data: {
+        full_name: name,
+        role: role,
+        faculty: faculty
+      }
+    }
+  });
+
+  if (error) {
+    err.textContent = error.message;
+    err.classList.add('show');
+    setTimeout(() => err.classList.remove('show'), 4000);
+    return;
+  }
+
+  // 3. Create the Database Row
+  // This step links the Auth account to your progress table
+  if (data.user) {
+    const { error: dbError } = await _supabase
+      .from('student_progress')
+      .insert([
+        { 
+          user_id: data.user.id,
+          user_email: email, 
+          full_name: name, 
+          faculty: faculty, 
+          is_admin: false,
+          progress_data: {
+            completedUnits: [],
+            passedQuizzes: [],
+            xp: 0,
+            quizScores: {}
+          }
+        }
+      ]);
+
+    if (dbError) {
+      console.error("Database Error:", dbError.message);
+      // Even if DB fails, the user is created. We inform them:
+      err.textContent = "Account created, but database initialization failed. Please contact admin.";
+      err.classList.add('show');
+      return;
+    }
+
+    // 4. Success Workflow
+    currentUser = data.user;
+    
+    // Save to session storage so the page doesn't ask to login again if they refresh
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
+    
+    // Hide the login screen and start the app
+    hideSplash(currentUser);
+    showToast("Welcome to the platform, " + name + "!");
+  }
 }
 
 function hideSplash(user){
@@ -2309,37 +2384,39 @@ function doLogout(){
   location.reload();
 }
 
-function applyUser(u){
-  const initials=(u.name||'DC').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase()||'DC';
-  document.getElementById('user-av').textContent=initials;
-  document.getElementById('sidebar-role').textContent=u.role||'Participant';
-  // Admin badge vs plain name
-  const nameEl=document.getElementById('sidebar-username');
-  if(nameEl){
-    if(isAdmin(u)){
-      nameEl.innerHTML=(u.name||'Administrator')+' <span class="admin-badge">ADMIN</span>';
+async function applyUser(u) {
+  currentUser = u;
+  
+  // 1. Fetch user profile and admin status from Supabase
+  const { data: profile, error } = await _supabase
+    .from('student_progress')
+    .select('is_admin, full_name, faculty')
+    .eq('user_id', u.id)
+    .single();
+
+  const isAdminFlag = profile?.is_admin || false;
+
+  // 2. Update UI Sidebar
+  const nameEl = document.getElementById('sidebar-username');
+  if (nameEl) {
+    if (isAdminFlag) {
+      nameEl.innerHTML = (profile?.full_name || u.email) + ' <span class="admin-badge">ADMIN</span>';
     } else {
-      nameEl.textContent=u.name||'Data Champion';
+      nameEl.textContent = profile?.full_name || u.email;
     }
   }
-  // Pre-fill profile fields
-  const fn=document.getElementById('p-name'); if(fn)fn.value=u.name||'';
-  const fr=document.getElementById('p-role'); if(fr)fr.value=u.role||'';
-  const ff=document.getElementById('p-faculty'); if(ff)ff.value=u.faculty||'';
-  const fe=document.getElementById('p-email'); if(fe)fe.value=u.email||'';
-  // Admin nav visibility
-  const adminSection=document.getElementById('admin-nav-section');
-  if(adminSection) adminSection.style.display=isAdmin(u)?'block':'none';
-  // Track last seen (non-admin)
-  if(!isAdmin(u)){
-    try{
-      const key=u.stateKey||('wits_dc_state_'+u.email.replace(/[^a-z0-9]/g,'_'));
-      const raw=localStorage.getItem(key);
-      const st=raw?JSON.parse(raw):{};
-      st.lastSeen=new Date().toISOString();
-      localStorage.setItem(key,JSON.stringify(st));
-    }catch(e){}
+
+  const roleEl = document.getElementById('sidebar-role');
+  if (roleEl && profile?.faculty) {
+    roleEl.textContent = profile.faculty;
   }
+
+  // 3. Show Admin Section if applicable
+  const adminSection = document.getElementById('admin-nav-section');
+  if (adminSection) adminSection.style.display = isAdminFlag ? 'block' : 'none';
+
+  // 4. Load the actual study progress (units, quiz scores, XP)
+  await loadState();
 }
 
 // Per-user state key
@@ -3260,16 +3337,42 @@ function saveLabTaskAnswer(uid,ti,val){
 // ══════════════════════════════════════
 // OVERRIDE saveState / loadState to use per-user keys
 // ══════════════════════════════════════
-function saveState(){
-  const key=getUserStateKey();
-  localStorage.setItem(key, JSON.stringify(state));
-}
-function loadState(){
-  const key=getUserStateKey();
-  const s=localStorage.getItem(key);
-  if(s){ const loaded=JSON.parse(s); Object.assign(state,loaded); }
+// --- NEW SUPABASE VERSIONS ---
+
+async function saveState() {
+  if (!currentUser) return; // Safety check
+
+  // This sends your 'state' object to the 'progress_data' column in Supabase
+  const { error } = await _supabase
+    .from('student_progress')
+    .upsert({ 
+      user_id: currentUser.id, 
+      progress_data: state, 
+      last_updated: new Date() 
+    });
+
+  if (error) console.error('Supabase Save Error:', error.message);
 }
 
+async function loadState() {
+  if (!currentUser) return;
+
+  const { data, error } = await _supabase
+    .from('student_progress')
+    .select('progress_data')
+    .eq('user_id', currentUser.id)
+    .single();
+
+  if (data && data.progress_data) {
+    // This overwrites your local 'state' variable with the cloud version
+    Object.assign(state, data.progress_data);
+    
+    // Refresh the UI so the student sees their progress
+    updateProgress();
+    buildUnitsGrid();
+    buildNavBadges();
+  }
+}
 // ══════════════════════════════════════
 // OVERRIDE renderUnit to inject interactive lab
 // ══════════════════════════════════════
@@ -3363,20 +3466,7 @@ const ADMIN_FACULTY  = 'Business Intelligence Services';
 const RESET_CODES_KEY = 'wits_dc_reset_codes';
 
 // ── Seed admin account on first run ───────────────────────────
-function ensureAdminExists(){
-  const accts = getAccounts();
-  if(!accts[ADMIN_EMAIL]){
-    accts[ADMIN_EMAIL] = {
-      name: ADMIN_NAME, email: ADMIN_EMAIL,
-      role: ADMIN_ROLE, faculty: ADMIN_FACULTY,
-      password: ADMIN_PASSWORD,
-      isAdmin: true,
-      stateKey: 'wits_dc_state_admin',
-      createdAt: new Date().toISOString()
-    };
-    saveAccounts(accts);
-  }
-}
+
 
 function isAdmin(u){ return u && (u.isAdmin === true || u.email === ADMIN_EMAIL); }
 
@@ -3401,7 +3491,6 @@ function hideForgotScreen(){
 function doForgotPassword(){
   const email = document.getElementById('fp-email').value.trim().toLowerCase();
   const err   = document.getElementById('fp-err');
-  const accts = getAccounts();
 
   if(!accts[email]){
     err.classList.add('show');
@@ -3440,9 +3529,7 @@ function doResetWithCode(){
     setTimeout(()=>err.style.display='none',3000); return;
   }
 
-  const accts = getAccounts();
   accts[email].password = newpass;
-  saveAccounts(accts);
 
   // Clear used code
   delete codes[email];
@@ -3457,19 +3544,41 @@ function doResetWithCode(){
 // ══════════════════════════════════════
 let _adminTarget = 'overview';
 
-function showAdminView(tab){
+async function showAdminView(tab){
   _adminTarget = tab;
-  // Show admin view container
+  
+  // 1. Fetch real data from Supabase for the Admin
+  const { data: allStudentData, error } = await _supabase
+    .from('student_progress')
+    .select('*');
+
+  if (error) {
+    showToast("Error fetching admin data: " + error.message);
+    return;
+  }
+
+  // 2. Map the database rows to the format your render functions expect
+  window.currentAdminData = allStudentData.map(row => ({
+    ...row,
+    // Ensure nested progress_data is handled
+    units: (row.progress_data?.completedUnits || []).length,
+    quizzes: (row.progress_data?.passedQuizzes || []).length,
+    labs: (row.progress_data?.completedLabs || []).length,
+    xp: row.progress_data?.xp || 0,
+    pct: Math.round((((row.progress_data?.completedUnits || []).length + (row.progress_data?.passedQuizzes || []).length) / 12) * 100),
+    complete: (row.progress_data?.completedUnits || []).length === 6 && (row.progress_data?.passedQuizzes || []).length === 6,
+    name: row.full_name || "Unknown",
+    email: row.user_email || "N/A", // <--- THIS NOW PULLS FROM THE DB
+    faculty: row.faculty || "N/A",
+    quizScores: row.progress_data?.quizScores || {}
+  }));
+
+  // UI logic (Keep your existing code below this)
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-admin').classList.add('active');
   document.querySelectorAll('.nav-item,.admin-nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('nav-admin-'+tab)?.classList.add('active');
-  document.getElementById('bc-current').textContent =
-    {overview:'Admin: Overview', users:'Admin: Users', progress:'Admin: Progress'}[tab] || 'Admin';
-
-  document.querySelectorAll('.admin-view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('admin-view-'+tab).classList.add('active');
-
+  
   if(tab==='overview') renderAdminOverview();
   if(tab==='users')    renderAdminUsers();
   if(tab==='progress') renderAdminProgress();
@@ -3478,37 +3587,23 @@ function showAdminView(tab){
 // ══════════════════════════════════════
 // ADMIN DATA HELPERS
 // ══════════════════════════════════════
-function getAllUserProgress(){
-  const accts = getAccounts();
-  return Object.values(accts).map(u=>{
-    const sk = u.stateKey || ('wits_dc_state_'+u.email.replace(/[^a-z0-9]/g,'_'));
-    const raw = localStorage.getItem(sk);
-    const st  = raw ? JSON.parse(raw) : {};
-    const units    = (st.completedUnits||[]).length;
-    const quizzes  = (st.passedQuizzes||[]).length;
-    const labs     = (st.completedLabs||[]).length;
-    const xp       = st.xp||0;
-    const pct      = Math.round(((units+quizzes+labs)/18)*100);
-    const complete = units===6 && quizzes===6;
-    return { ...u, units, quizzes, labs, xp, pct, complete,
-             lastSeen: st.lastSeen || null, quizScores: st.quizScores||{} };
-  });
-}
 
 function getAdminStats(){
-  const users = getAllUserProgress();
-  const learners = users.filter(u=>!u.isAdmin);
+  // Use the data we already fetched
+  const users = window.currentAdminData || [];
+  const learners = users.filter(u => u.user_id !== currentUser.id); // Hide admin from stats
+  
   return {
     total:      learners.length,
-    active:     learners.filter(u=>u.pct>0).length,
-    completed:  learners.filter(u=>u.complete).length,
-    avgPct:     learners.length ? Math.round(learners.reduce((s,u)=>s+u.pct,0)/learners.length) : 0,
-    byUnit:     [1,2,3,4,5,6].map(n=>({
-      n, done: learners.filter(u=>u.units>=n).length
+    active:     learners.filter(u => u.pct > 0).length,
+    completed:  learners.filter(u => u.complete).length,
+    avgPct:     learners.length ? Math.round(learners.reduce((s, u) => s + u.pct, 0) / learners.length) : 0,
+    byUnit:     [1, 2, 3, 4, 5, 6].map(n => ({
+      n, done: learners.filter(u => u.units >= n).length
     })),
-    faculties:  [...new Set(learners.map(u=>u.faculty||'Unknown'))]
-      .map(f=>({f, count:learners.filter(u=>(u.faculty||'Unknown')===f).length}))
-      .sort((a,b)=>b.count-a.count).slice(0,6)
+    faculties:  [...new Set(learners.map(u => u.faculty || 'Unknown'))]
+      .map(f => ({ f, count: learners.filter(u => (u.faculty || 'Unknown') === f).length }))
+      .sort((a, b) => b.count - a.count).slice(0, 6)
   };
 }
 
@@ -3516,6 +3611,7 @@ function getAdminStats(){
 // ADMIN RENDER: OVERVIEW
 // ══════════════════════════════════════
 function renderAdminOverview(){
+  const users = window.currentAdminData || []; 
   const s = getAdminStats();
   const el = document.getElementById('admin-view-overview');
   el.innerHTML = `
@@ -3623,7 +3719,7 @@ let _adminUserTarget = null;
 
 function renderAdminUsers(filter=''){
   const el = document.getElementById('admin-view-users');
-  const allUsers = getAllUserProgress().filter(u=>!u.isAdmin);
+  const allUsers = window.currentAdminData || [];
   const users = filter ? allUsers.filter(u=>
     (u.name||'').toLowerCase().includes(filter.toLowerCase()) ||
     (u.email||'').toLowerCase().includes(filter.toLowerCase()) ||
@@ -3675,7 +3771,7 @@ function renderAdminUsers(filter=''){
 // ADMIN RENDER: PROGRESS REPORT
 // ══════════════════════════════════════
 function renderAdminProgress(){
-  const users = getAllUserProgress().filter(u=>!u.isAdmin);
+  const users = window.currentAdminData || [];
   const el = document.getElementById('admin-view-progress');
   const UNIT_NAMES = ['Foundations of Data Literacy','Student Data Landscape','Analysis & Visualisation','Predictive Modelling','Ethics & Governance','Insight to Intervention'];
 
@@ -3737,15 +3833,6 @@ function renderAdminProgress(){
     </div>`;
 }
 
-function getUserProgressRaw(email){
-  const accts = getAccounts();
-  const u = accts[email];
-  if(!u) return {};
-  const sk = u.stateKey || ('wits_dc_state_'+email.replace(/[^a-z0-9]/g,'_'));
-  const raw = localStorage.getItem(sk);
-  return raw ? JSON.parse(raw) : {};
-}
-
 // ══════════════════════════════════════
 // ADMIN MODAL ACTIONS
 // ══════════════════════════════════════
@@ -3768,10 +3855,8 @@ function confirmAdminPasswordReset(){
     err.style.display='block';
     setTimeout(()=>err.style.display='none',3000); return;
   }
-  const accts = getAccounts();
   if(accts[_adminUserTarget]){
     accts[_adminUserTarget].password = newPass;
-    saveAccounts(accts);
     document.getElementById('reset-pass-ok').classList.add('show');
     setTimeout(()=>{ closeAdminModal(); renderAdminUsers(); showToast('Password reset for '+_adminUserTarget); },1200);
   }
@@ -3784,12 +3869,10 @@ function openAdminDeleteModal(email, name){
 }
 
 function confirmAdminDelete(){
-  const accts = getAccounts();
   const u = accts[_adminUserTarget];
   if(u){
     // Remove account
     delete accts[_adminUserTarget];
-    saveAccounts(accts);
     // Remove state
     const sk = u.stateKey||('wits_dc_state_'+_adminUserTarget.replace(/[^a-z0-9]/g,'_'));
     localStorage.removeItem(sk);
