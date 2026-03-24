@@ -14,6 +14,160 @@ body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);min-he
 button{cursor:pointer;font-family:inherit}
 input,textarea,select{font-family:inherit}
 
+/* ── LOADING SCREEN ── */
+#loading-screen {
+
+position: fixed;
+
+inset: 0;
+
+background: #001420;
+
+z-index: 99999;
+
+display: flex;
+
+flex-direction: column;
+
+align-items: center;
+
+justify-content: center;
+
+gap: 22px;
+
+transition: opacity .35s ease, visibility .35s ease;
+
+}
+
+#loading-screen.hidden {
+
+opacity: 0;
+
+visibility: hidden;
+
+pointer-events: none;
+
+}
+
+.ls-glow {
+
+position: absolute;
+
+inset: 0;
+
+background: radial-gradient(ellipse 500px 350px at 50% 40%,
+
+  rgba(200,168,75,.07) 0%, transparent 65%);
+
+pointer-events: none;
+
+}
+
+.ls-logo {
+
+width: 58px; height: 58px;
+
+border-radius: 16px;
+
+background: linear-gradient(135deg, #C8A84B, #E8C96B);
+
+display: flex; align-items: center; justify-content: center;
+
+font-family: 'Lora', serif;
+
+font-size: 26px; font-weight: 700;
+
+color: #001420;
+
+position: relative; z-index: 1;
+
+animation: ls-pulse 2.2s ease-in-out infinite;
+
+}
+
+.ls-text {
+
+text-align: center;
+
+position: relative; z-index: 1;
+
+}
+
+.ls-title {
+
+font-family: 'Sora', sans-serif;
+
+font-size: 13px; font-weight: 600;
+
+color: rgba(255,255,255,.6);
+
+letter-spacing: .08em;
+
+margin-bottom: 14px;
+
+}
+
+.ls-bar-track {
+
+width: 200px; height: 2px;
+
+background: rgba(255,255,255,.07);
+
+border-radius: 2px;
+
+overflow: hidden;
+
+margin: 0 auto 10px;
+
+}
+
+.ls-bar-fill {
+
+height: 100%;
+
+background: linear-gradient(to right, #C8A84B, #E8C96B);
+
+border-radius: 2px;
+
+animation: ls-bar 1.8s ease-in-out infinite;
+
+}
+
+.ls-status {
+
+font-family: 'JetBrains Mono', monospace;
+
+font-size: 10.5px;
+
+color: rgba(200,168,75,.4);
+
+letter-spacing: .06em;
+
+min-height: 16px;
+
+position: relative; z-index: 1;
+
+}
+
+@keyframes ls-pulse {
+
+0%,100% { box-shadow: 0 0 0 0 rgba(200,168,75,.3); }
+
+50%      { box-shadow: 0 0 0 10px rgba(200,168,75,0); }
+
+}
+
+@keyframes ls-bar {
+
+0%   { width: 0%;    margin-left: 0; }
+
+50%  { width: 100%;  margin-left: 0; }
+
+100% { width: 0%;    margin-left: 100%; }
+
+}
+
+
 /* ── SIDEBAR ─────────────────────────────── */
 .sidebar{width:272px;flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;overflow-y:auto;z-index:200}
 .sb-logo{padding:20px 18px 14px;border-bottom:1px solid rgba(200,168,75,.15)}
@@ -527,6 +681,24 @@ input,textarea,select{font-family:inherit}
 </style>
 </head>
 <body>
+<!-- ════ LOADING SCREEN ════ -->
+  <div id="loading-screen">
+
+    <div class="ls-glow"></div>
+  
+    <div class="ls-logo">W</div>
+  
+    <div class="ls-text">
+  
+      <div class="ls-title">Wits Data Literacy</div>
+  
+      <div class="ls-bar-track"><div class="ls-bar-fill"></div></div>
+  
+      <div class="ls-status" id="ls-status">Initialising...</div>
+  
+    </div>
+  
+  </div>
 
 <!-- ════ SIGN IN SCREEN ════ -->
 <div id="signin-screen">
@@ -935,6 +1107,19 @@ input,textarea,select{font-family:inherit}
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
 
 <script>
+//0. Loading screen
+function showLoadingScreen(msg = 'Loading...') {
+  const screen = document.getElementById('loading-screen');
+  const status = document.getElementById('ls-status');
+  if (screen) screen.classList.remove('hidden');
+  if (status) status.textContent = msg;
+}
+
+function hideLoadingScreen() {
+  const screen = document.getElementById('loading-screen');
+  if (screen) screen.classList.add('hidden');
+}
+
 
 // 1. Initialize Supabase (Replace with your actual keys from Supabase Dashboard)
 const supabaseUrl = 'https://zlzwwhepyoeeaflpgrwp.supabase.co';
@@ -1750,7 +1935,7 @@ function showView(id){
       if(existing) existing.remove();
       const layout=certContent?certContent.querySelector('.cert-gen-layout'):null;
       if(layout) layout.style.display='';
-      const u=getCurrentUser();
+      const u=currentUser;
       if(u){
         const n=document.getElementById('cf-name');if(n&&!n.value)n.value=u.name||'';
         const r=document.getElementById('cf-role');if(r&&!r.value)r.value=u.role||'';
@@ -1986,7 +2171,7 @@ function checkAnswer(uid,qi){
   document.getElementById(`exp-${uid}-${qi}`).classList.add('show');
 }
 
-function submitQuiz(uid){
+async function submitQuiz(uid){
   const unit=UNITS[uid-1];
   const qs=quizState[uid];
   qs.submitted=true;
@@ -2002,12 +2187,12 @@ function submitQuiz(uid){
     state.passedQuizzes.push(uid);
     state.xp+=100;
     state.quizScores[uid]=score;
-    saveState();
+    await saveState();
     buildNavBadges();
     updateProgress();
   } else if(!state.quizScores[uid]){
     state.quizScores[uid]=score;
-    saveState();
+    await saveState();
   }
 
   document.getElementById(`qnav-${uid}`).innerHTML='';
@@ -2042,11 +2227,11 @@ function retryQuiz(uid){
 // ══════════════════════════════════════
 // UNIT COMPLETION
 // ══════════════════════════════════════
-function markUnitDone(uid){
+async function markUnitDone(uid){
   if(!state.completedUnits.includes(uid)){
     state.completedUnits.push(uid);
     state.xp+=50;
-    saveState();
+    await saveState();
     showToast(`Unit ${uid} marked complete! +50 XP`);
     updateProgress();
     buildNavBadges();
@@ -2285,7 +2470,7 @@ async function doLogin() {
     currentUser = data.user;
     
     // Persist session in local browser storage so refreshes don't log them out
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
+     
     
     // 4. Important: Wait for user metadata and progress to load before hiding splash
     await applyUser(currentUser);
@@ -2365,7 +2550,7 @@ async function doRegister() {
     currentUser = data.user;
     
     // Save to session storage so the page doesn't ask to login again if they refresh
-    sessionStorage.setItem(SESSION_KEY, JSON.stringify(currentUser));
+     
     
     // Hide the login screen and start the app
     hideSplash(currentUser);
@@ -2373,15 +2558,24 @@ async function doRegister() {
   }
 }
 
-function hideSplash(user){
-  document.getElementById('signin-screen').style.display='none';
-  applyUser(user);
-  init();
+// REPLACE the entire hideSplash function with this:
+async function hideSplash(user) {
+  showLoadingScreen('Loading your progress...');
+  document.getElementById('signin-screen').style.display = 'none';
+  currentUser = user;
+  await applyUser(user);
+  await init();
+  hideLoadingScreen();
 }
 
-function doLogout(){
-  sessionStorage.removeItem(SESSION_KEY);
-  location.reload();
+async function doLogout() {
+
+await _supabase.auth.signOut();
+
+currentUser = null;
+
+location.reload();
+
 }
 
 async function applyUser(u) {
@@ -2419,25 +2613,6 @@ async function applyUser(u) {
   await loadState();
 }
 
-// Per-user state key
-function getUserStateKey(){
-  const u=getCurrentUser();
-  return u ? u.stateKey||'wits_dc_state' : 'wits_dc_state';
-}
-
-// ══════════════════════════════════════
-// BOOT
-// ══════════════════════════════════════
-window.addEventListener('DOMContentLoaded', ()=>{
-  ensureAdminExists();
-  const u = getCurrentUser();
-  if(u){
-    document.getElementById('signin-screen').style.display='none';
-    applyUser(u);
-    init();
-  }
-  // else signin screen stays visible
-});
 
 // ══════════════════════════════════════
 // LAB DATA — EMBEDDED DATASETS
@@ -2548,12 +2723,12 @@ function renderInteractiveLab(uid){
 
 function labDone(uid){ return (state.completedLabs||[]).includes(uid); }
 
-function completeLab(uid){
+async function completeLab(uid){
   if(!state.completedLabs) state.completedLabs=[];
   if(!state.completedLabs.includes(uid)){
     state.completedLabs.push(uid);
     state.xp+=75;
-    saveState();
+    await saveState();
     updateProgress();
     showToast(`Lab ${uid} completed! +75 XP 🔬`);
     document.getElementById(`lab-done-badge-${uid}`).textContent='✓ Lab Complete';
@@ -2757,7 +2932,7 @@ function buildAccurateScorecard(){
     </div>`).join('');
 }
 
-function setACCURATERating(dim,rating,btn){
+async function setACCURATERating(dim,rating,btn){
   [1,2,3,4,5].forEach(n=>{
     const b=document.getElementById(`acc-${dim}-${n}`);
     if(b){b.style.background=n<=rating?'var(--blue)':'#fff';b.style.color=n<=rating?'#fff':'var(--text-mid)';b.style.borderColor=n<=rating?'var(--blue)':'var(--border)';}
@@ -2767,7 +2942,7 @@ function setACCURATERating(dim,rating,btn){
   if(noteEl)noteEl.textContent=notes[rating-1];
   if(!state.accurateRatings)state.accurateRatings={};
   state.accurateRatings[dim]=rating;
-  saveState();
+  await saveState();
 }
 
 function checkLab1Task(taskIdx){
@@ -2796,14 +2971,14 @@ function checkLab1Task(taskIdx){
   saveLabTaskAnswer(1,taskIdx,document.getElementById(`l1ta${taskIdx}`)?.value||'');
 }
 
-function autoSaveReport(){
+async function autoSaveReport(){
   if(!state.labReports)state.labReports={};
   state.labReports.lab1={
     summary:document.getElementById('report-summary')?.value||'',
     issues:document.getElementById('report-issues')?.value||'',
     actions:document.getElementById('report-actions')?.value||''
   };
-  saveState();
+  await saveState();
 }
 function getReportField(field){return state.labReports?.lab1?.[field]||'';}
 
@@ -2900,11 +3075,11 @@ function buildLab2(){
   </div>`;
 }
 
-function toggleSystemRelevant(i){
+async function toggleSystemRelevant(i){
   if(!state.sysRelevant)state.sysRelevant=[];
   const idx=state.sysRelevant.indexOf(i);
   if(idx===-1){state.sysRelevant.push(i);}else{state.sysRelevant.splice(idx,1);}
-  saveState();
+  await saveState();
   const btn=document.getElementById(`sys-btn-${i}`);
   if(btn){btn.textContent=state.sysRelevant.includes(i)?'✓ Selected':'+ Select';btn.style.background=state.sysRelevant.includes(i)?'var(--green-bg)':'#fff';btn.style.borderColor=state.sysRelevant.includes(i)?'var(--green)':'var(--border)';}
   const cnt=document.getElementById('sys-selected-count');
@@ -3045,9 +3220,9 @@ function buildQuintileChart(data){
   return buildBarChart(qData.map(d=>({label:`Quintile ${d.q} (n=${d.n})`,val:d.avg,color:d.q<=2?'#C0392B':d.q===3?'#B7791F':'#1A7F5A'})),' WPA',100);
 }
 
-function saveSCQA(){
+async function saveSCQA(){
   state.scqa={s:document.getElementById('scqa-s')?.value||'',c:document.getElementById('scqa-c')?.value||'',q:document.getElementById('scqa-q')?.value||'',a:document.getElementById('scqa-a')?.value||''};
-  saveState();
+  await saveState();
 }
 
 // ─── LAB 4: ARI Interpretation ─────────
@@ -3173,7 +3348,7 @@ function filterLab4(){
   const filtered=LAB_DATA.unit4.filter(r=>(!band||r.RiskBand===band)&&(!race||r.Race===race));
   document.getElementById('l4-tbody').innerHTML=buildLab4Rows(filtered);
 }
-function saveIntervention(i,v){if(!state.interventions)state.interventions={};state.interventions[i]=v;saveState();}
+async function saveIntervention(i,v){if(!state.interventions)state.interventions={};state.interventions[i]=v;await saveState();}
 
 // ─── LAB 5: Ethics Scenarios ────────────
 function buildLab5(){
@@ -3245,9 +3420,9 @@ function revealEthicsHint(i,type){
   const el=document.getElementById(`l5hint${i}${type==='violations'?'v':'c'}`);
   if(el){el.textContent=type==='violations'?ethicsScenarios[i].violations:ethicsScenarios[i].correct;el.className='task-feedback show correct';}
 }
-function saveEthicsRecord(){
+async function saveEthicsRecord(){
   state.ethicsRecord={issue:document.getElementById('ethics-issue')?.value||'',principles:document.getElementById('ethics-principles')?.value||'',decision:document.getElementById('ethics-decision')?.value||''};
-  saveState();
+  await saveState();
 }
 
 // ─── LAB 6: 90-Day Action Plan ──────────
@@ -3292,19 +3467,19 @@ function buildLab6(){
   </div>`;
 }
 
-function saveActionPlan(){
+async function saveActionPlan(){
   if(!state.actionPlan)state.actionPlan={};
   ['problem','data','analysis','intervention','measure'].forEach(k=>{
     const el=document.getElementById(`ap-${k}`);
     if(el)state.actionPlan[k]=el.value;
   });
-  saveState();
+  await saveState();
 }
 
 function refreshActionPlanPreview(){
   saveActionPlan();
   const ap=state.actionPlan||{};
-  const user=getCurrentUser();
+  const user=currentUser;
   const labels={problem:'Problem Definition',data:'Data Plan',analysis:'Analysis Plan',intervention:'Intervention Design',measure:'Measurement Framework'};
   const html=Object.entries(labels).map(([k,label])=>`
     <div style="margin-bottom:16px;padding:14px;background:#fff;border-radius:8px;border-left:4px solid var(--blue)">
@@ -3318,20 +3493,20 @@ function refreshActionPlanPreview(){
 // ── Lab task state helpers ────────────────
 function labTaskDone(uid,ti){ return (state.labTasks?.[uid]||[]).includes(ti); }
 function labTaskAnswer(uid,ti){ return state.labAnswers?.[uid]?.[ti]||''; }
-function toggleLabTask(uid,ti){
+async function toggleLabTask(uid,ti){
   if(!state.labTasks)state.labTasks={};
   if(!state.labTasks[uid])state.labTasks[uid]=[];
   const idx=state.labTasks[uid].indexOf(ti);
   if(idx===-1)state.labTasks[uid].push(ti); else state.labTasks[uid].splice(idx,1);
-  saveState();
+  await saveState();
   const el=document.getElementById(`l${uid}t${ti}`);
   if(el)el.classList.toggle('completed-task',state.labTasks[uid].includes(ti));
 }
-function saveLabTaskAnswer(uid,ti,val){
+async function saveLabTaskAnswer(uid,ti,val){
   if(!state.labAnswers)state.labAnswers={};
   if(!state.labAnswers[uid])state.labAnswers[uid]={};
   state.labAnswers[uid][ti]=val;
-  saveState();
+  await saveState();
 }
 
 // ══════════════════════════════════════
@@ -3339,19 +3514,37 @@ function saveLabTaskAnswer(uid,ti,val){
 // ══════════════════════════════════════
 // --- NEW SUPABASE VERSIONS ---
 
+// Debounce timer — prevents hammering Supabase on every keypress
+let _saveTimer = null;
+
 async function saveState() {
-  if (!currentUser) return; // Safety check
+  if (!currentUser) {
+    // Not logged in — silently skip (happens during boot)
+    return;
+  }
 
-  // This sends your 'state' object to the 'progress_data' column in Supabase
-  const { error } = await _supabase
-    .from('student_progress')
-    .upsert({ 
-      user_id: currentUser.id, 
-      progress_data: state, 
-      last_updated: new Date() 
-    });
+  // Debounce: wait 800ms after the last call before writing
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(async () => {
 
-  if (error) console.error('Supabase Save Error:', error.message);
+    const { error } = await _supabase
+      .from('student_progress')
+      .upsert({
+        user_id:       currentUser.id,
+        user_email:    currentUser.email,
+        progress_data: state,
+        last_updated:  new Date().toISOString()
+      }, {
+        onConflict: 'user_id'   // update if exists, insert if new
+      });
+
+    if (error) {
+      console.error('[saveState] Supabase write failed:', error.message);
+      // Show a non-blocking toast so the user knows
+      showToast('⚠️ Progress not saved — check your connection');
+    }
+
+  }, 800);
 }
 
 async function loadState() {
@@ -3363,16 +3556,20 @@ async function loadState() {
     .eq('user_id', currentUser.id)
     .single();
 
-  if (data && data.progress_data) {
-    // This overwrites your local 'state' variable with the cloud version
+  if (error) {
+    if (error.code !== 'PGRST116') {
+      // PGRST116 = "no rows" — normal for brand-new users, skip
+      console.error('[loadState] Supabase read failed:', error.message);
+    }
+    return;
+  }
+
+  if (data?.progress_data) {
+    // Merge cloud state into local — cloud wins
     Object.assign(state, data.progress_data);
-    
-    // Refresh the UI so the student sees their progress
-    updateProgress();
-    buildUnitsGrid();
-    buildNavBadges();
   }
 }
+
 // ══════════════════════════════════════
 // OVERRIDE renderUnit to inject interactive lab
 // ══════════════════════════════════════
@@ -3492,11 +3689,6 @@ function doForgotPassword(){
   const email = document.getElementById('fp-email').value.trim().toLowerCase();
   const err   = document.getElementById('fp-err');
 
-  if(!accts[email]){
-    err.classList.add('show');
-    setTimeout(()=>err.classList.remove('show'),3000);
-    return;
-  }
 
   // Generate a 6-digit reset code tied to this email
   const code = String(Math.floor(100000 + Math.random()*900000));
@@ -3529,7 +3721,6 @@ function doResetWithCode(){
     setTimeout(()=>err.style.display='none',3000); return;
   }
 
-  accts[email].password = newpass;
 
   // Clear used code
   delete codes[email];
@@ -3694,7 +3885,7 @@ function renderAdminOverview(){
       <table class="admin-tbl">
         <thead><tr><th>Name</th><th>Faculty</th><th>Progress</th><th>Units</th><th>Quizzes</th><th>XP</th><th>Status</th></tr></thead>
         <tbody>
-          ${getAllUserProgress().filter(u=>!u.isAdmin).slice(0,8).map(u=>`
+          ${(window.currentAdminData||[]).slice(0,8).map(u=>`
             <tr>
               <td><strong>${u.name||'—'}</strong><br><span style="font-size:10.5px;color:var(--text-light)">${u.email}</span></td>
               <td style="font-size:12px">${(u.faculty||'—').replace('Faculty of ','')}</td>
@@ -3788,11 +3979,10 @@ function renderAdminProgress(){
         <thead><tr><th>Unit</th><th>Title</th><th>Content Done</th><th>Quiz Passed</th><th>Lab Done</th><th>All 3 Done</th></tr></thead>
         <tbody>
           ${[1,2,3,4,5,6].map(n=>{
-            const unitDone  = users.filter(u=>{const s=getUserProgressRaw(u.email);return (s.completedUnits||[]).includes(n);}).length;
-            const quizDone  = users.filter(u=>{const s=getUserProgressRaw(u.email);return (s.passedQuizzes||[]).includes(n);}).length;
-            const labDone   = users.filter(u=>{const s=getUserProgressRaw(u.email);return (s.completedLabs||[]).includes(n);}).length;
-            const allThree  = users.filter(u=>{const s=getUserProgressRaw(u.email);return (s.completedUnits||[]).includes(n)&&(s.passedQuizzes||[]).includes(n)&&(s.completedLabs||[]).includes(n);}).length;
-            const pctU=users.length?Math.round(unitDone/users.length*100):0;
+            const unitDone  = users.filter(u => (u.progress_data?.completedUnits||[]).includes(n)).length;
+            const quizDone  = users.filter(u => (u.progress_data?.passedQuizzes||[]).includes(n)).length;
+            const labDone   = users.filter(u => (u.progress_data?.completedLabs||[]).includes(n)).length;
+            const allThree  = users.filter(u => (u.progress_data?.completedUnits||[]).includes(n) && (u.progress_data?.passedQuizzes||[]).includes(n) && (u.progress_data?.completedLabs||[]).includes(n)).length;            const pctU=users.length?Math.round(unitDone/users.length*100):0;
             const pctQ=users.length?Math.round(quizDone/users.length*100):0;
             const pctL=users.length?Math.round(labDone/users.length*100):0;
             const pctA=users.length?Math.round(allThree/users.length*100):0;
@@ -3846,20 +4036,20 @@ function openAdminResetModal(email, name){
   document.getElementById('admin-reset-modal').classList.add('show');
 }
 
-function confirmAdminPasswordReset(){
+async function confirmAdminPasswordReset(){
   const newPass = document.getElementById('new-pass-input').value;
   const confirm = document.getElementById('new-pass-confirm').value;
   const err = document.getElementById('reset-pass-err');
   if(newPass.length < 6 || newPass !== confirm){
     err.textContent='Passwords do not match or are too short (min 6 chars).';
     err.style.display='block';
-    setTimeout(()=>err.style.display='none',3000); return;
+    setTimeout(()=>err.style.display='none',3000);
+    return;
   }
-  if(accts[_adminUserTarget]){
-    accts[_adminUserTarget].password = newPass;
-    document.getElementById('reset-pass-ok').classList.add('show');
-    setTimeout(()=>{ closeAdminModal(); renderAdminUsers(); showToast('Password reset for '+_adminUserTarget); },1200);
-  }
+  // Stage 3 will wire this to Supabase admin API
+  document.getElementById('reset-pass-ok').textContent = '⚠️ Password reset requires Stage 3 setup.';
+  document.getElementById('reset-pass-ok').classList.add('show');
+  setTimeout(()=>closeAdminModal(), 2000);
 }
 
 function openAdminDeleteModal(email, name){
@@ -3868,18 +4058,10 @@ function openAdminDeleteModal(email, name){
   document.getElementById('admin-delete-modal').classList.add('show');
 }
 
-function confirmAdminDelete(){
-  const u = accts[_adminUserTarget];
-  if(u){
-    // Remove account
-    delete accts[_adminUserTarget];
-    // Remove state
-    const sk = u.stateKey||('wits_dc_state_'+_adminUserTarget.replace(/[^a-z0-9]/g,'_'));
-    localStorage.removeItem(sk);
-  }
+async function confirmAdminDelete(){
+  // Stage 3 will wire this to Supabase admin API
   closeAdminModal();
-  renderAdminUsers();
-  showToast('Account deleted.');
+  showToast('⚠️ Account deletion requires Stage 3 setup.');
 }
 
 function closeAdminModal(){
@@ -3894,18 +4076,42 @@ document.addEventListener('click', e=>{
 
 // applyUser — admin logic merged into original above
 
-// ══════════════════════════════════════
-// BOOT
-// ══════════════════════════════════════
-window.addEventListener('DOMContentLoaded', ()=>{
-  ensureAdminExists();
-  const u = getCurrentUser();
-  if(u){
-    document.getElementById('signin-screen').style.display='none';
-    applyUser(u);
-    init();
+// ══════════════════════════════════════════════════
+// SINGLE BOOT — replaces BOTH DOMContentLoaded blocks
+// ══════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', async () => {
+
+// 1. Show loading screen immediately
+showLoadingScreen('Connecting...');
+
+// 2. Ask Supabase: is anyone already logged in?
+const { data: { session } } = await _supabase.auth.getSession();
+
+if (session?.user) {
+  // Returning user — load their data then show the app
+  showLoadingScreen('Loading your progress...');
+  currentUser = session.user;
+  await applyUser(currentUser);   // fetches profile + isAdmin
+  await init();                     // builds UI with real data
+  hideLoadingScreen();
+  document.getElementById('signin-screen').style.display = 'none';
+} else {
+  // No session — show sign-in screen
+  hideLoadingScreen();
+  // signin-screen is visible by default in HTML, so nothing else needed
+}
+
+// 3. Listen for future auth changes (login / logout)
+_supabase.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && session?.user) {
+    currentUser = session.user;
+  } else if (event === 'SIGNED_OUT') {
+    currentUser = null;
   }
 });
+
+});
+
 </script>
 </body>
 </html>
