@@ -3652,20 +3652,10 @@ function renderUnit(unit){
 // OVERRIDE showView for certificate — check completion
 // showView cert+admin logic merged into original above
 
-// ══════════════════════════════════════
-// ADMIN CONSTANTS
-// ══════════════════════════════════════
-const ADMIN_EMAIL    = 'admin@wits.ac.za';
-const ADMIN_PASSWORD = 'WitsBISO@2025!';  // Default — admin should change on first login
-const ADMIN_NAME     = 'Platform Administrator';
-const ADMIN_ROLE     = 'Administrator';
-const ADMIN_FACULTY  = 'Business Intelligence Services';
-const RESET_CODES_KEY = 'wits_dc_reset_codes';
-
 // ── Seed admin account on first run ───────────────────────────
 
 
-function isAdmin(u){ return u && (u.isAdmin === true || u.email === ADMIN_EMAIL); }
+//function isAdmin(u){ return u && (u.isAdmin === true || u.email === ADMIN_EMAIL); }
 
 // ══════════════════════════════════════
 // FORGOT PASSWORD
