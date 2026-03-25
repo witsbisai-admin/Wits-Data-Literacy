@@ -1,20 +1,18 @@
 {
   "version": 2,
-  "builds": [
-    { "src": "platform/index.html", "use": "@vercel/static" },
-    { "src": "styles/(.*)", "use": "@vercel/static" }
-  ],
-  "routes": [
+  "cleanUrls": true,
+  "rewrites": [
     {
-      "src": "/styles/(.*)",
-      "dest": "/styles/$1"
+      "source": "/styles/:path*",
+      "destination": "/platform/styles/:path*"
     },
     {
-      "handle": "filesystem"
+      "source": "/js/:path*",
+      "destination": "/platform/js/:path*"
     },
     {
-      "src": "/(.*)",
-      "dest": "/platform/index.html"
+      "source": "/(.*)",
+      "destination": "/platform/index.html"
     }
   ],
   "headers": [
