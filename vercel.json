@@ -1,18 +1,21 @@
 {
   "version": 2,
   "builds": [
-    { "src": "platform/index.html", "use": "@vercel/static" }
+    { "src": "platform/index.html", "use": "@vercel/static" },
+    { "src": "platform/styles/**", "use": "@vercel/static" },
+    { "src": "platform/js/**", "use": "@vercel/static" }
   ],
   "routes": [
+    { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/platform/index.html" }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Frame-Options",        "value": "SAMEORIGIN" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Cache-Control",          "value": "no-cache, must-revalidate" }
+        { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
       ]
     }
   ]
