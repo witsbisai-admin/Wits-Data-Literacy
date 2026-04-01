@@ -53,21 +53,40 @@
       <div id="register-form" class="signin-form" style="display:none">
         <div class="sf-group"><label>Full Name</label><input id="rg-name" placeholder="e.g. Dr Amahle Dlamini"></div>
         <div class="sf-group"><label>Email</label><input id="rg-email" type="email" placeholder="your.email@wits.ac.za"></div>
-        <div class="sf-group"><label>Designation / Role</label><input id="rg-role" placeholder="e.g. Senior Lecturer"></div>
-        <div class="sf-group"><label>Faculty / Division</label><input id="rg-faculty" placeholder="e.g. Faculty of Commerce"></div>
+        <!--<div class="sf-group"><label>Designation / Role</label><input id="rg-role" placeholder="e.g. Senior Lecturer"></div>-->
+        <!--<div class="sf-group"><label>Faculty / Division</label><input id="rg-faculty" placeholder="e.g. Faculty of Commerce"></div>-->
+
+        <div class="sf-group">
+
+          <label>Designation / Role</label>
+          <input id="rg-role" autocomplete="off" list="role-list" placeholder="e.g. Senior Lecturer">
+          <datalist id="role-list"></datalist>
+
+        </div>  
+        
+        <div class="sf-group">
+
+          <label>Faculty / Division</label>
+          <input id="rg-faculty" autocomplete="off" list="faculty-list" placeholder="e.g. Faculty of Commerce">
+          
+          <datalist id="faculty-list"></datalist>
+
+        </div>  
+
         <div class="sf-group"><label>Password</label><input id="rg-pass" type="password" placeholder="Minimum 6 characters" onkeydown="if(event.key==='Enter')doRegister()"></div>
         <div class="signin-error" id="register-err">Please fill in all fields correctly.</div>
         <button class="signin-btn" onclick="doRegister()">Create Account →</button>
       </div>
 
-      <div class="demo-users">
+      <!--Demo accounts for-->
+      <!--<div class="demo-users">
         <div class="demo-label">Quick Demo Accounts</div>
         <div class="demo-btns">
           <div class="demo-btn" onclick="demoLogin('Dr Amahle Dlamini','Senior Lecturer','Faculty of Commerce','amahle@wits.ac.za')">Dr Dlamini</div>
           <div class="demo-btn" onclick="demoLogin('Prof Sipho Nkosi','Associate Professor','Faculty of Engineering','sipho@wits.ac.za')">Prof Nkosi</div>
           <div class="demo-btn" onclick="demoLogin('Ms Keitumetse Tau','Academic Advisor','Student Services','keitu@wits.ac.za')">Ms Tau</div>
         </div>
-      </div>
+      </div>-->
     </div>
   </div>
 

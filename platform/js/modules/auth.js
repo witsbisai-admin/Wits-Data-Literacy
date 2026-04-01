@@ -43,8 +43,8 @@ async function doLogin() {
     showToast("Welcome back!");
   }
 }
-
-async function doRegister() {
+// old 1
+/*async function doRegister() {
   const name = document.getElementById('rg-name').value.trim();
   const email = document.getElementById('rg-email').value.trim().toLowerCase();
   const role = document.getElementById('rg-role').value.trim();
@@ -56,7 +56,7 @@ async function doRegister() {
   if (!name || !email || !pass || pass.length < 6) {
     err.textContent = 'Please fill in all fields. Password must be at least 6 characters.';
     err.classList.add('show');
-    setTimeout(() => err.classList.remove('show'), 4000);
+    setTimeout(() => err.classList.remove('show'), 8000);
     return;
   }
 
@@ -74,13 +74,13 @@ async function doRegister() {
     }
   });
 
-  if (error) {
+  if (error && !data?.user) {
     err.textContent = error.message;
     err.classList.add('show');
-    setTimeout(() => err.classList.remove('show'), 4000);
+    setTimeout(() => err.classList.remove('show'), 8000);
     return;
   }
-
+  console.log(data.user)
   // 3. Create the Database Row
   // This step links the Auth account to your progress table
   if (data.user) {
@@ -103,7 +103,8 @@ async function doRegister() {
       ]);
 
     if (dbError) {
-      console.error("Database Error:", dbError.message);
+      console.log("dberror section")
+      //console.error("Database Error:", dbError.message);
       // Even if DB fails, the user is created. We inform them:
       err.textContent = "Account created, but database initialization failed. Please contact admin.";
       err.classList.add('show');
@@ -120,7 +121,77 @@ async function doRegister() {
     hideSplash(currentUser);
     showToast("Welcome to the platform, " + name + "!");
   }
-}
+}*/
+
+// old 2
+
+/*async function doRegister() {
+  const name = document.getElementById('rg-name').value.trim();
+  const email = document.getElementById('rg-email').value.trim().toLowerCase();
+  const role = document.getElementById('rg-role').value.trim();
+  const faculty = document.getElementById('rg-faculty').value.trim();
+  const pass = document.getElementById('rg-pass').value;
+  const err = document.getElementById('register-err');
+
+  // 1. Validation
+  if (!name || !email || !pass || pass.length < 6) {
+    err.textContent = 'Please fill in all fields. Password must be at least 6 characters.';
+    err.classList.add('show');
+    setTimeout(() => err.classList.remove('show'), 8000);
+    return;
+  }
+
+  // 2. Sign up user
+  const { data, error } = await _supabase.auth.signUp({
+    email,
+    password: pass,
+    options: {
+      data: {
+        full_name: name,
+        role,
+        faculty
+      }
+    }
+  });
+
+  if (error) {
+    err.textContent = error.message;
+    err.classList.add('show');
+    return;
+  }
+
+  // 3. Ensure session exists (important)
+  const { data: sessionData } = await _supabase.auth.getSession();
+
+  if (!sessionData.session) {
+    err.textContent = "Account created. Please log in.";
+    err.classList.add('show');
+    return;
+  }
+
+  // 4. Wait briefly for trigger to insert row (optional but safe)
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  // 5. Fetch user progress (created by trigger)
+  const { data: progress, error: progressError } = await _supabase
+    .from('student_progress')
+    .select('*')
+    .eq('user_id', data.user.id)
+    .maybeSingle();   // ✅ important
+
+  if (progressError) {
+    console.error(progressError);
+  }
+
+  console.log("User:", data.user);
+  console.log("Progress:", progress);
+
+  // 6. Continue app
+  currentUser = data.user;
+
+  hideSplash(currentUser);
+  showToast("Welcome to the platform, " + name + "!");
+}*/
 
 
 async function hideSplash(user) {
@@ -140,6 +211,46 @@ currentUser = null;
 
 location.reload();
 
+}
+
+async function doRegister() {
+  const name = document.getElementById('rg-name').value.trim();
+  const email = document.getElementById('rg-email').value.trim().toLowerCase();
+  const role = document.getElementById('rg-role').value.trim();
+  const faculty = document.getElementById('rg-faculty').value.trim();
+  const pass = document.getElementById('rg-pass').value;
+  const err = document.getElementById('register-err');
+
+  if (!name || !email || !pass || pass.length < 6) {
+    err.textContent = 'Please fill in all fields. Password must be at least 6 characters.';
+    err.classList.add('show');
+    return;
+  }
+
+  const { data, error } = await _supabase.auth.signUp({
+    email,
+    password: pass,
+    options: {
+      data: {
+        full_name: name,
+        role,
+        faculty
+      }
+    }
+  });
+
+  if (error) {
+    err.textContent = error.message;
+    err.classList.add('show');
+    return;
+  }
+
+  // ✅ NEW BEHAVIOR
+  err.textContent = "Account created! Please check your email to confirm your account before logging in.";
+  err.classList.add('show');
+
+  // DO NOT log user in
+  // DO NOT fetch data yet
 }
 
 async function applyUser(u) {

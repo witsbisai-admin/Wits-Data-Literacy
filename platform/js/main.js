@@ -70,3 +70,83 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   });
 });
+
+// Array of suggested options implemented in the sign up form
+// Faculties and divisions
+const faculties_divisions = [
+                                "Commerce, Law and Management",
+                                "Engineering and the Built Environment",
+                                "Health Sciences",
+                                "Health Sciences",
+                                "Humanities",
+                                "Science",
+                                "Council and Executive Leadership",
+                                "University Secretariat",
+                                "Division of Student Affairs",
+                                "International Students Office",
+                                "Disability Rights Unit (DRU)",
+                                "Gender Equity Office (GEO)",
+                                "Student Crisis and Support Contacts",
+                                "Wits Student Employment Portal",
+                                "University Libraries",
+                                "Postgraduate Research and Development Office",
+                                "Examinations and Graduation Office",
+                                "Financial Aid and Scholarships Administration",
+                                "Fees Office",
+                                "Academic Information and Systems Unit (AISU)",
+                                "Human Resources (HR)",
+                                "Wits Protection Services",
+                                "Wits ICT Helpdesk / Information Technology Support",
+                                "Transformation and Employment Equity Office",
+                                "Wits Communications, Marketing & Media",
+                                "Wits Development and Fundraising Office",
+                                "Business Intelligence Services (BIS)"
+                            ];
+
+
+// Designation/Role
+const designation_roles = [
+                                "Chancellor",
+                                "Chairman of Council",
+                                "President of Convocation",
+                                "Vice‑Chancellor and Principal",
+                                "Senior Deputy Vice‑Chancellor (Academic)",
+                                "Deputy Vice‑Chancellor (Systems and Operations)",
+                                "Deputy Vice‑Chancellor (Research & Innovation)",
+                                "Deputy Vice‑Chancellor (People Development & Culture)",
+                                "Pro Vice‑Chancellor (special strategic portfolios)",
+                                "University Registrar",
+                                "Chief Financial Officer (CFO)",
+                                "Dean",
+                                "Assistant Dean",
+                                "University Council Member",
+                                "Senate",
+                                "University Forum",
+                                "Student Representative Council (SRC)",
+                                "Professor / Associate Professor / Senior Lecturer",
+                                "Head of School",
+                                "Director of Centres or Institutes",
+                                "Administrative Manager",
+                                "Professional Support Staff",
+                                "Administratior",
+                                "Intern",
+                                "Student"
+                            ];
+
+// Get the datalist element
+const dataList_faculties_divisions = document.getElementById("faculty-list");
+const dataList_designation_roles = document.getElementById("role-list");
+
+// Populate datalist
+faculties_divisions.forEach(faculty => {
+    const option = document.createElement("option");
+    option.value = faculty;
+    dataList_faculties_divisions.appendChild(option);
+});
+
+// Populate datalist
+designation_roles.forEach(role => {
+    const option = document.createElement("option");
+    option.value = role;
+    dataList_designation_roles.appendChild(option);
+});
