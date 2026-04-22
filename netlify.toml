@@ -1,0 +1,23 @@
+# ═══════════════════════════════════════════════════════════════
+#  Wits Data Literacy Platform — Netlify Configuration
+#  Drop this file alongside index.html in your Netlify site root
+# ═══════════════════════════════════════════════════════════════
+
+[build]
+  publish = "platform"    # folder containing index.html
+
+# Redirect all paths to index.html (SPA routing)
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options        = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection       = "1; mode=block"
+    Referrer-Policy        = "strict-origin"
+    Cache-Control          = "no-cache, must-revalidate"

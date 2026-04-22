@@ -1,0 +1,69 @@
+/* ── TOAST NOTIFICATION ── */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--blue);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 6px 24px rgba(0,0,0,.25);transform:translateY(60px);opacity:0;transition:all .3s;z-index:999;display:flex;align-items:center;gap:8px}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* ── REUSABLE BUTTONS ── */
+.next-btn{width:100%;padding:11px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-size:12.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;transition:background .2s}
+.next-btn:hover{background:var(--blue-mid)}
+.mark-done-btn{width:100%;padding:10px;background:transparent;color:var(--green);border:2px solid var(--green);border-radius:9px;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s;margin-top:8px}
+.mark-done-btn:hover{background:var(--green-bg)}
+.mark-done-btn.done{background:var(--green);color:#fff}
+.retry-btn{padding:10px 22px;background:var(--blue);color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:600;transition:background .2s}
+.retry-btn:hover{background:var(--blue-mid)}
+.cta-btn{padding:10px 14px;border-radius:9px;border:none;font-size:12.5px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s}
+.cta-primary{background:var(--blue);color:#fff;box-shadow:0 3px 12px rgba(0,59,92,.25)}
+.cta-primary:hover{background:var(--blue-mid)}
+.cta-secondary{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy)}
+.cta-secondary:hover{opacity:.9}
+.cta-ghost{background:transparent;color:var(--text-mid);border:1.5px solid var(--border)}
+.cta-ghost:hover{border-color:var(--blue);color:var(--blue);background:#F0F6FF}
+
+/* ── INFO BOXES (Alerts/Callouts) ── */
+.info-box{border-radius:10px;padding:16px 18px;margin:14px 0;border-left:4px solid}
+.info-box.blue{background:linear-gradient(135deg,#EEF4FB,#F5F9FF);border-color:var(--blue)}
+.info-box.gold{background:var(--gold-pale);border-color:var(--gold)}
+.info-box.green{background:var(--green-bg);border-color:var(--green)}
+.info-box.red{background:var(--red-bg);border-color:var(--red)}
+.info-box.purple{background:#F5F0FF;border-color:#7C3AED}
+.info-box .ib-title{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.info-box.blue .ib-title{color:var(--blue)}
+.info-box.gold .ib-title{color:var(--amber)}
+.info-box.green .ib-title{color:var(--green)}
+.info-box.red .ib-title{color:var(--red)}
+.info-box.purple .ib-title{color:#7C3AED}
+.info-box p{font-size:13px;line-height:1.65;color:var(--text-mid);margin-bottom:4px}
+.info-box ul{padding-left:16px}
+.info-box li{font-size:13px;color:var(--text-mid);line-height:1.65;margin-bottom:3px}
+
+/* ── DATA TABLES ── */
+.data-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12.5px}
+.data-table th{background:var(--blue);color:#fff;padding:9px 12px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.05em}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text-mid);vertical-align:top;line-height:1.5}
+.data-table tr:nth-child(even) td{background:#F8FAFD}
+.data-table tr:hover td{background:#F0F6FF}
+
+/* ── CONTENT WIDGETS (Concepts, Case Studies, Diagrams) ── */
+.diagram-box{background:var(--navy);border-radius:10px;padding:20px 24px;margin:14px 0;overflow-x:auto}
+.diagram-box pre{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:rgba(200,168,75,.85);line-height:1.7;white-space:pre;min-width:0}
+
+.key-concept{background:linear-gradient(135deg,#EEF7FF,#F0F9FF);border:1px solid #BFDBFE;border-radius:10px;padding:16px 18px;margin:14px 0}
+.kc-label{font-size:9.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--blue-mid);margin-bottom:4px}
+.kc-term{font-size:15px;font-weight:600;color:var(--blue);margin-bottom:6px;font-family:'Lora',serif}
+.kc-def{font-size:13px;color:var(--text-mid);line-height:1.65;font-style:italic;margin-bottom:5px}
+.kc-src{font-size:11px;color:var(--text-light)}
+
+.case-study{background:linear-gradient(135deg,#F5F0FF,#EEE6FF);border:1px solid #C4B5FD;border-radius:10px;padding:16px 18px;margin:14px 0}
+.cs-label{font-size:9.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#7C3AED;margin-bottom:4px}
+.cs-title{font-size:14px;font-weight:600;color:#4C1D95;margin-bottom:10px}
+.cs-body{font-size:13px;color:var(--text-mid);line-height:1.65}
+.cs-body p{margin-bottom:6px}
+
+/* ── FORM ELEMENTS (Toggles, Inputs) ── */
+.toggle{width:36px;height:20px;background:#DDE6F0;border-radius:10px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--blue)}
+.toggle::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.toggle.on::after{transform:translateX(16px)}
+.cf-group{margin-bottom:12px}
+.cf-group label{display:block;font-size:11.5px;font-weight:500;color:var(--text-mid);margin-bottom:5px}
+.cf-group input,.cf-group select{width:100%;padding:8px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;color:var(--text);outline:none;transition:border .2s}
+.cf-group input:focus,.cf-group select:focus{border-color:var(--blue)}

@@ -1,0 +1,68 @@
+
+/* ── SIDEBAR ─────────────────────────────── */
+.sidebar{width:272px;flex-shrink:0;background:var(--navy);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;overflow-y:auto;z-index:200}
+.sb-logo{padding:20px 18px 14px;border-bottom:1px solid rgba(200,168,75,.15)}
+.logo-row{display:flex;align-items:center;gap:11px}
+.logo-w{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-size:18px;font-weight:600;color:var(--navy);flex-shrink:0}
+.logo-text .t1{font-size:12px;font-weight:600;color:#fff;letter-spacing:.02em}
+.logo-text .t2{font-size:9.5px;color:rgba(200,168,75,.7);font-weight:300;margin-top:1px}
+.sb-user{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:9px}
+.user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#005580,#0077AA);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0}
+.user-info .uname{font-size:11.5px;font-weight:500;color:#fff}
+.user-info .urole{font-size:10px;color:var(--text-light);margin-top:1px}
+.sb-progress{padding:10px 18px;border-bottom:1px solid rgba(255,255,255,.06)}
+.prog-labels{display:flex;justify-content:space-between;margin-bottom:5px}
+.prog-labels span{font-size:9.5px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em}
+.prog-labels .pct{color:var(--gold);font-weight:600}
+.prog-outer{height:3px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
+.prog-inner{height:100%;background:linear-gradient(to right,var(--gold),var(--gold-light));border-radius:2px;transition:width .5s ease}
+.sb-nav{flex:1;padding:8px 0}
+.nav-section{padding:12px 18px 5px;font-size:9px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.22)}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 18px;cursor:pointer;transition:all .15s;font-size:12px;color:rgba(255,255,255,.5);font-weight:400;position:relative}
+.nav-item:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.85)}
+.nav-item.active{background:rgba(200,168,75,.12);color:#fff}
+.nav-item.active::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:0 2px 2px 0}
+.nav-icon{font-size:13px;width:16px;text-align:center;flex-shrink:0}
+.nav-label{flex:1}
+.nav-badge{font-size:9px;padding:2px 5px;border-radius:10px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.35);font-weight:500}
+.nav-badge.done{background:rgba(26,127,90,.3);color:#4ade80}
+.nav-badge.locked{background:rgba(255,255,255,.04);color:rgba(255,255,255,.18)}
+.sb-footer{padding:14px 18px;border-top:1px solid rgba(255,255,255,.06)}
+.cert-btn{width:100%;padding:9px 14px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy);border:none;border-radius:8px;font-size:11.5px;font-weight:700;letter-spacing:.04em;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .2s}
+.cert-btn:hover{opacity:.9}
+
+/* ── MAIN ────────────────────────────────── */
+.main{margin-left:272px;min-height:100vh; width: calc(100% - 272px);}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+.breadcrumb{display:flex;align-items:center;gap:7px;font-size:12.5px}
+.bc-home{color:var(--text-light)}
+#bc-hamburger-id,#bc-close-id{font-size:13px;display: none;color:var(--text-light)}
+.bc-sep{color:var(--border)}
+.bc-cur{color:var(--blue);font-weight:500}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.xp-pill{display:flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;background:var(--gold-pale);font-size:11.5px;font-weight:600;color:var(--amber)}
+.content{padding:28px;width: 100%; box-sizing: border-box;}
+ #sidebar-id {display: block;}
+
+@media (max-width: 1024px) {
+  #bc-hamburger-id {
+    display: block;
+  }
+  #sidebar-id {
+    display: none;
+    top: 56px;  
+  }
+  .sidebar{
+    width: 50%;
+  }
+  .main{
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .sidebar{
+    width: 100%;
+  }
+}

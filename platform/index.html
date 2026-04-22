@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wits Data Literacy Platform — Data Champions</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  
+
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/views.css">
+</head>
+<body>
+
+  <div id="loading-screen">
+    <div class="ls-glow"></div>
+    <div class="ls-logo">W</div>
+    <div class="ls-text">
+      <div class="ls-title">Wits Data Literacy</div>
+      <div class="ls-bar-track"><div class="ls-bar-fill"></div></div>
+      <div class="ls-status" id="ls-status">Initialising...</div>
+    </div>
+  </div>
+
+  <div id="signin-screen">
+    <div class="signin-card">
+      <div class="signin-logo">
+        <div class="signin-logo-w">W</div>
+        <div class="signin-logo-text">
+          <div class="sl1">Wits Data Literacy</div>
+          <div class="sl2">Business Intelligence Services</div>
+        </div>
+      </div>
+      <div id = "signin-title-id" class="signin-title">Welcome Back</div>
+      <div id="signin-sub-id" class="signin-sub">Sign in to access the Data Champions Learning Platform</div>
+      <div class="signin-tabs">
+        <div class="stab active" onclick="switchAuthTab('login',this)">Sign In</div>
+        <div class="stab" onclick="switchAuthTab('register',this)">Create Account</div>
+      </div>
+
+      <div id="login-form" class="signin-form">
+        <div class="sf-group"><label>Email</label><input id="li-email" type="email" placeholder="your.email@wits.ac.za"></div>
+        <!--<div class="sf-group"><label>Password</label><input id="li-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>-->
+       
+        <div class="sf-group" style="position:relative; width:relative;">
+          <label>Password</label>
+          
+          <input id="li-pass" type="password" placeholder="••••••••"
+            oninput="toggleIconVisibility('Sign_in')"
+            onfocus="toggleIconVisibility('Sign_in')"
+            onblur="toggleIconVisibility('Sign_in')"
+            style="width:100%; padding-right:35px;">
+
+          <i id="toggle-pass_login" class="fa-solid fa-eye"
+            onclick="togglePassword('Sign_in')"
+            style="position:absolute; right:10px; top:30px; cursor:pointer; display:none; color:#fff">
+          </i>
+        </div>
+
+        <div class="signin-error" id="login-err">Invalid email or password. Please try again.</div>
+        <div class="forgot-link" onclick="showForgotScreen()">Forgot password?</div>
+        <button class="signin-btn" onclick="doLogin()">Sign In →</button>
+      </div>
+
+      <div id="register-form" class="signin-form" style="display:none">
+        <div class="sf-group"><label>Full Name</label><input id="rg-name" placeholder="e.g. Dr Amahle Dlamini"></div>
+        <div class="sf-group"><label>Email</label><input id="rg-email" type="email" placeholder="your.email@wits.ac.za"></div>
+        <!--<div class="sf-group"><label>Designation / Role</label><input id="rg-role" placeholder="e.g. Senior Lecturer"></div>-->
+        <!--<div class="sf-group"><label>Faculty / Division</label><input id="rg-faculty" placeholder="e.g. Faculty of Commerce"></div>-->
+
+        <div class="sf-group">
+
+          <label>Designation / Role</label>
+          <input id="rg-role" autocomplete="off" list="role-list" placeholder="e.g. Senior Lecturer">
+          <datalist id="role-list"></datalist>
+
+        </div>  
+        
+        <div class="sf-group">
+
+          <label>Faculty / Division</label>
+          <input id="rg-faculty" autocomplete="off" list="faculty-list" placeholder="e.g. Faculty of Commerce">
+          
+          <datalist id="faculty-list"></datalist>
+
+        </div>  
+
+        <!--<div class="sf-group"><label>Password</label><input id="rg-pass" type="password" placeholder="Minimum 6 characters" onkeydown="if(event.key==='Enter')doRegister()"></div>-->
+        <div class="sf-group" style="position:relative; width:relative;">
+          <label>Password</label>
+          
+          <input id="rg-pass" type="password" placeholder="Minimum 6 characters"
+            oninput="toggleIconVisibility('Sign_up')"
+            onfocus="toggleIconVisibility('Sign_up')"
+            onblur="toggleIconVisibility('Sign_up')"
+            style="width:100%; padding-right:35px;">
+
+          <i id="toggle-pass_reg" class="fa-solid fa-eye"
+            onclick="togglePassword('Sign_up')"
+            style="position:absolute; right:10px; top:30px; cursor:pointer; display:none; color:#fff">
+          </i>
+        </div>
+
+        <div class="signin-error" id="register-err">Please fill in all fields correctly.</div>
+        <!--Success Modal-->
+      <div id="successModal" class="success-modal">
+        <div class="success-modal-content">
+          
+          <!-- Animated SVG Checkmark -->
+          <svg class="checkmark" viewBox="0 0 52 52">
+            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark-check" fill="none" d="M14 27l7 7 16-16"/>
+          </svg>
+
+          <h2>Account creation initiated!</h2>
+          <p id="successMessage">Please check your email to confirm your account before logging in.</p>
+          <button onclick="closeSuccessModal()">OK</button>
+        </div>
+    </div>
+        <button class="signin-btn" onclick="doRegister()">Create Account →</button>
+      </div>
+
+      
+      <!--Demo accounts for-->
+      <!--<div class="demo-users">
+        <div class="demo-label">Quick Demo Accounts</div>
+        <div class="demo-btns">
+          <div class="demo-btn" onclick="demoLogin('Dr Amahle Dlamini','Senior Lecturer','Faculty of Commerce','amahle@wits.ac.za')">Dr Dlamini</div>
+          <div class="demo-btn" onclick="demoLogin('Prof Sipho Nkosi','Associate Professor','Faculty of Engineering','sipho@wits.ac.za')">Prof Nkosi</div>
+          <div class="demo-btn" onclick="demoLogin('Ms Keitumetse Tau','Academic Advisor','Student Services','keitu@wits.ac.za')">Ms Tau</div>
+        </div>
+      </div>-->
+    </div>
+  </div>
+
+  <div id="forgot-screen">
+    <div class="forgot-card">
+      <div class="signin-logo" style="justify-content:flex-start;margin-bottom:20px">
+        <div class="signin-logo-w">W</div>
+        <div class="signin-logo-text"><div class="sl1">Wits Data Literacy</div><div class="sl2">Password Reset</div></div>
+      </div>
+      <h2>Reset Password</h2>
+      
+      <div class="signin-form" id="forgot-step1">
+        <p>Enter your email address and we will send you a secure link to reset your password.</p>
+        <div class="sf-group"><label>Email Address</label><input id="fp-email" type="email" placeholder="your.email@wits.ac.za"></div>
+        <div class="signin-error" id="fp-err">No account found with that email address.</div>
+        <button class="signin-btn" onclick="doForgotPassword()">Send Reset Link →</button>
+      </div>
+  
+      <div class="reset-code-box" id="reset-code-box" style="display:none;">
+        <p id="reset-success-msg" style="color:#fff; margin:0;"></p>
+      </div>
+  
+      <div id="forgot-step2" style="display:none">
+        <p>Please enter your new password below.</p>
+        <div class="signin-form">
+           
+          <!--<div class="sf-group"><label>New Password</label><input id="fp-newpass" type="password" placeholder="Minimum 6 characters"></div>-->
+          <div class="sf-group" style="position:relative; width:relative;">
+            <label>New Password</label>
+            
+            <input id="fp-newpass" type="password" placeholder="Minimum 6 characters"
+              oninput="toggleIconVisibility('forgot_pw_new')"
+              onfocus="toggleIconVisibility('forgot_pw_new')"
+              onblur="toggleIconVisibility('forgot_pw_new')"
+              style="width:100%; padding-right:35px;">
+
+            <i id="toggle-pass_new" class="fa-solid fa-eye"
+              onclick="togglePassword('forgot_pw_new')"
+              style="position:absolute; right:10px; top:30px; cursor:pointer; display:none; color:#fff">
+            </i>
+          </div>
+
+          <!--<div class="sf-group"><label>Confirm New Password</label><input id="fp-confirm" type="password" placeholder="Repeat new password"></div>-->
+          <div class="sf-group" style="position:relative; width:relative;">
+            <label>Confirm New Password</label>
+            
+            <input id="fp-confirm" type="password" placeholder="Minimum 6 characters"
+              oninput="toggleIconVisibility('forgot_pw_confirm')"
+              onfocus="toggleIconVisibility('forgot_pw_confirm')"
+              onblur="toggleIconVisibility('forgot_pw_confirm')"
+              style="width:100%; padding-right:35px;">
+
+            <i id="toggle-pass_confirm" class="fa-solid fa-eye"
+              onclick="togglePassword('forgot_pw_confirm')"
+              style="position:absolute; right:10px; top:30px; cursor:pointer; display:none; color:#fff">
+            </i>
+          </div>
+
+          <div class="signin-error" id="fp-err2">Passwords do not match or are too short.</div>
+          <button class="signin-btn" onclick="doResetWithCode()">Update Password →</button>
+        </div>
+      </div>
+  
+      <div class="forgot-back" onclick="hideForgotScreen()">← Back to Sign In</div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="admin-reset-modal">
+    <div class="modal-box">
+      <h3>🔑 Reset User Password</h3>
+      <p>Enter a new password for <strong id="reset-user-name">—</strong>.</p>
+      <div class="modal-field"><label>New Password</label><input type="password" id="new-pass-input" placeholder="Minimum 6 characters"></div>
+      <div class="modal-field"><label>Confirm Password</label><input type="password" id="new-pass-confirm" placeholder="Repeat password"></div>
+      <div class="signin-error" id="reset-pass-err" style="display:none;margin-top:6px">Passwords do not match or are too short.</div>
+      <div class="modal-success" id="reset-pass-ok">✓ Password updated successfully!</div>
+      <div class="modal-actions">
+        <button class="admin-btn admin-btn-blue" onclick="closeAdminModal()">Cancel</button>
+        <button class="admin-btn admin-btn-purple" onclick="confirmAdminPasswordReset()" style="background:#7C3AED;color:#fff">Set Password</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="admin-delete-modal">
+    <div class="modal-box">
+      <h3 style="color:var(--red)">⚠️ Delete Account</h3>
+      <p>Are you sure you want to permanently delete the account for <strong id="delete-user-name">—</strong>? This will erase all their progress and quiz scores.</p>
+      <div class="modal-actions">
+        <button class="admin-btn admin-btn-blue" onclick="closeAdminModal()">Cancel</button>
+        <button class="admin-btn admin-btn-red" onclick="confirmAdminDelete()" style="background:var(--red);color:#fff">Delete Account</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell">
+    
+    <nav id = "sidebar-id" class="sidebar">
+      <div class="sb-logo">
+        <div class="logo-row">
+          <div class="logo-w">W</div>
+          <div class="logo-text">
+            <div class="t1">Wits Data Literacy</div>
+            <div class="t2">Business Intelligence Services</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sb-user">
+        <div class="user-av" id="user-av">DC</div>
+        <div class="user-info">
+          <div class="uname" id="sidebar-username">Data Champion</div>
+          <div class="urole" id="sidebar-role">Participant</div>
+        </div>
+      </div>
+
+      <div class="sb-progress">
+        <div class="prog-labels"><span>Overall Progress</span><span class="pct" id="prog-pct">0%</span></div>
+        <div class="prog-outer"><div class="prog-inner" id="prog-bar" style="width:0%"></div></div>
+      </div>
+
+      <div class="sb-nav">
+        <div class="nav-section">Navigation</div>
+        <div class="nav-item active" onclick="showView('dashboard')">
+          <span class="nav-icon">🏠</span><span class="nav-label">Dashboard</span>
+        </div>
+        <div class="nav-item" onclick="showView('profile')">
+          <span class="nav-icon">👤</span><span class="nav-label">My Profile</span>
+        </div>
+
+        <div class="nav-section">Learning Units</div>
+        <div class="nav-item" id="nav-u1" onclick="showUnit(1)">
+          <span class="nav-icon">📊</span><span class="nav-label">Unit 1: Data Literacy Foundations</span>
+          <span class="nav-badge" id="nb-1">—</span>
+        </div>
+        <div class="nav-item" id="nav-u2" onclick="showUnit(2)">
+          <span class="nav-icon">🗄️</span><span class="nav-label">Unit 2: Student Data Landscape</span>
+          <span class="nav-badge" id="nb-2">—</span>
+        </div>
+        <div class="nav-item" id="nav-u3" onclick="showUnit(3)">
+          <span class="nav-icon">📈</span><span class="nav-label">Unit 3: Analysis & Visualisation</span>
+          <span class="nav-badge" id="nb-3">—</span>
+        </div>
+        <div class="nav-item" id="nav-u4" onclick="showUnit(4)">
+          <span class="nav-icon">🤖</span><span class="nav-label">Unit 4: Predictive Modelling</span>
+          <span class="nav-badge" id="nb-4">—</span>
+        </div>
+        <div class="nav-item" id="nav-u5" onclick="showUnit(5)">
+          <span class="nav-icon">⚖️</span><span class="nav-label">Unit 5: Ethics & Governance</span>
+          <span class="nav-badge" id="nb-5">—</span>
+        </div>
+        <div class="nav-item" id="nav-u6" onclick="showUnit(6)">
+          <span class="nav-icon">🎯</span><span class="nav-label">Unit 6: Insight to Intervention</span>
+          <span class="nav-badge" id="nb-6">—</span>
+        </div>
+
+        <div class="nav-section">Tools</div>
+        <div class="nav-item" onclick="showView('certificate')">
+            <span class="nav-icon">🏆</span><span class="nav-label">Certificate Generator</span>
+        </div>
+        <div class="nav-item" id="nav-survey" onclick="showView('survey')">
+            <span class="nav-icon">📝</span><span class="nav-label">Course Survey</span>
+        </div>
+        <div class="nav-item" onclick="showView('references')">
+            <span class="nav-icon">📚</span><span class="nav-label">References</span>
+        </div>
+        
+        <div id="admin-nav-section" style="display:none">
+          <div class="admin-sidebar-section">Administration</div>
+          <div class="admin-nav-item" id="nav-admin-overview" onclick="showAdminView('overview')">
+            <span class="nav-icon">📊</span><span class="nav-label">Overview Dashboard</span>
+          </div>
+          <div class="admin-nav-item" id="nav-admin-users" onclick="showAdminView('users')">
+            <span class="nav-icon">👥</span><span class="nav-label">User Management</span>
+          </div>
+          <div class="admin-nav-item" id="nav-admin-progress" onclick="showAdminView('progress')">
+            <span class="nav-icon">📈</span><span class="nav-label">Progress Reports</span>
+          </div>
+          <div class="admin-nav-item" id="nav-admin-survey" onclick="showAdminView('survey')">
+            <span class="nav-icon">📝</span><span class="nav-label">Survey Analytics</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sb-footer">
+        <button class="cert-btn" onclick="showView('certificate')">🏆 Generate Certificate</button>
+      </div>
+    </nav>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="breadcrumb">
+          <span id = "bc-hamburger-id" onclick = "toggleHamburger('open')" class="bc-hamburger"><i class="fas fa-bars"></i></span>
+          <span id = "bc-close-id" onclick = "toggleHamburger('close')" class="bc-close"><i class="fas fa-times"></i></span>
+          <span class="bc-home">Wits · Business Intelligence Services</span>
+          <span class="bc-sep">›</span>
+          <span class="bc-cur" id="bc-current">Dashboard</span>
+        </div>
+        <div class="topbar-right">
+          <div class="xp-pill"><span class="score-icon">⭐</span><span id="total-xp">0 XP</span></div>
+          <button class="logout-btn" onclick="doLogout()">⎋ Sign Out</button>
+        </div>
+      </div>
+
+      <div class="content">
+
+        <div class="view active" id="view-dashboard">
+          <div class="hero animate-in">
+            <div class="hero-tag">NQF Level 7 · Short Learning Programme</div>
+            <h1>Data Literacy for<br>Data Champions</h1>
+            <p>Empowering Wits staff to use student data responsibly and effectively to drive equitable student success outcomes across all faculties.</p>
+            <div class="hero-stats">
+              <div class="hstat"><div class="n">6</div><div class="l">Learning Units</div></div>
+              <div class="hstat"><div class="n">12h</div><div class="l">Contact Hours</div></div>
+              <div class="hstat"><div class="n">6</div><div class="l">Quizzes</div></div>
+              <div class="hstat"><div class="n">8</div><div class="l">NQF Credits</div></div>
+            </div>
+          </div>
+
+          <div class="stats-row">
+            <div class="scard"><div class="scard-icon" style="background:#EEF4FB;">📖</div><div><div class="scard-val" id="dash-completed">0/6</div><div class="scard-lbl">Units Completed</div></div></div>
+            <div class="scard"><div class="scard-icon" style="background:#E6F5EF;">✅</div><div><div class="scard-val" id="dash-quizzes">0/6</div><div class="scard-lbl">Quizzes Passed</div></div></div>
+            <div class="scard"><div class="scard-icon" style="background:var(--gold-pale);">⭐</div><div><div class="scard-val" id="dash-xp">0</div><div class="scard-lbl">Total XP Earned</div></div></div>
+            <div class="scard"><div class="scard-icon" style="background:#F5F0FF;">🏆</div><div><div class="scard-val" id="dash-cert">Not Ready</div><div class="scard-lbl">Certificate Status</div></div></div>
+          </div>
+
+          <div class="units-heading">All Learning Units</div>
+          <div class="units-grid" id="units-grid"></div>
+        </div>
+
+        <div class="view" id="view-profile">
+          <div class="section-card animate-in">
+            <h2>My Profile</h2>
+            <p style="margin-bottom:20px;font-size:13px;color:var(--text-mid)">Update your personal details. Email addresses are fixed and cannot be changed.</p>
+            
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div class="cf-group">
+                <label>Full Name</label>
+                <input id="p-name" placeholder="e.g. Dr Amahle Dlamini">
+              </div>
+              
+              <div class="cf-group">
+                <label>Email (Read-only)</label>
+                <input id="p-email" readonly style="background:var(--bg); cursor:not-allowed; color:var(--text-light);" title="Email cannot be changed">
+              </div>
+              
+              <div class="cf-group">
+                <label>Designation / Role</label>
+                <input id="p-role" autocomplete="off" list="role-list" placeholder="Select or type your role">
+              </div>
+              
+              <div class="cf-group">
+                <label>Faculty / Division</label>
+                <input id="p-faculty" autocomplete="off" list="faculty-list" placeholder="Select or type your faculty">
+              </div>
+            </div>
+            
+            <button class="next-btn" style="width:auto;padding:10px 24px;margin-top:16px" onclick="saveProfile()">Save Profile Changes</button>
+          </div>
+        </div>
+
+        <div class="view" id="view-unit"></div>
+        
+        <div class="view" id="view-survey">
+          <div class="section-card animate-in">
+            <div class="survey-header">
+              <h2>Data Literacy Experience Survey</h2>
+              <p id="survey-desc">Your feedback helps us drive data culture at Wits.</p>
+              
+              <div class="survey-progress-container" style="margin: 20px 0;">
+                <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:5px">
+                  <span>Survey Completion</span>
+                  <span id="survey-step-text">Step 1 of 3</span>
+                </div>
+                <div class="prog-outer" style="background:#e2e8f0; height:8px">
+                  <div id="survey-prog-bar" class="prog-inner" style="width: 0%; height:100%"></div>
+                </div>
+              </div>
+            </div>
+        
+            <div id="survey-container">
+              </div>
+        
+            <div class="survey-navigation" style="margin-top: 30px; display: flex; gap: 12px; justify-content: space-between;">
+              <button id="survey-prev-btn" class="cta-btn cta-ghost" onclick="surveyPrev()" style="display:none">← Back</button>
+              <button id="survey-next-btn" class="cta-btn cta-primary" onclick="surveyNext()">Next →</button>
+              <button id="survey-submit-btn" class="cta-btn cta-primary" onclick="submitSurvey()" style="display:none; background:var(--green)">Submit Feedback</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="view" id="view-certificate">
+          <div class="cert-gen-layout animate-in">
+
+          <div id="admin-config">
+            <div class="cert-form-panel">
+              <h2>🏆 Certificate Generator</h2>
+
+              <div class="cf-section">Recipient Details</div>
+              <div class="cf-group"><label>Full Name</label><input id="cf-name" value="" oninput="renderCert()" placeholder="Dr Amahle Dlamini"></div>
+              <div class="cf-group"><label>Designation / Role</label><input id="cf-role" value="" oninput="renderCert()" placeholder="Senior Lecturer"></div>
+              <div class="cf-group"><label>Faculty / Division</label><input id="cf-faculty" value="" oninput="renderCert()" placeholder="Faculty of Commerce"></div>
+
+              <div class="cf-section">Programme Details</div>
+              <div class="cf-group"><label>Programme Name</label><input id="cf-programme" value="Data Literacy for Data Champions" oninput="renderCert()"></div>
+              <div class="cf-row">
+                <div class="cf-group"><label>NQF Level</label><input id="cf-nqf" value="NQF Level 7" oninput="renderCert()"></div>
+                <div class="cf-group"><label>Credits</label><input id="cf-credits" value="8 Credits" oninput="renderCert()"></div>
+              </div>
+              <div class="cf-group"><label>Completion Date</label><input type="date" id="cf-date" oninput="renderCert()"></div>
+              <div class="cf-group"><label>Certificate Number</label><input id="cf-certno" oninput="renderCert()"></div>
+              <div class="cf-group">
+                <label>Grade</label>
+                <div class="grade-btns">
+                  <button class="grade-btn" onclick="setGrade('Pass',this)">Pass</button>
+                  <button class="grade-btn active" onclick="setGrade('Merit',this)">Merit</button>
+                  <button class="grade-btn" onclick="setGrade('Distinction',this)">Distinction</button>
+                  <button class="grade-btn" onclick="setGrade('Competent',this)">Competent</button>
+                  <button class="grade-btn" onclick="setGrade('Excellence',this)">Excellence</button>
+                  <button class="grade-btn" onclick="setGrade('—',this)">None</button>
+                </div>
+              </div>
+
+              <div class="cf-section">Signatories</div>
+              <div class="cf-row"><div class="cf-group"><label>Signatory 1 Name</label><input id="cf-s1n" value="Mr Innocent Manvura" oninput="renderCert()"></div><div class="cf-group"><label>Title</label><input id="cf-s1t" value="Program Director" oninput="renderCert()"></div></div>
+             <!-- <div class="cf-row"><div class="cf-group"><label>Signatory 2 Name</label><input id="cf-s2n" value="Dr T. Mokoena" oninput="renderCert()"></div><div class="cf-group"><label>Title</label><input id="cf-s2t" value="Head, BISO" oninput="renderCert()"></div></div>
+              <div class="cf-row"><div class="cf-group"><label>Signatory 3 Name</label><input id="cf-s3n" value="Dr P. Sithole" oninput="renderCert()"></div><div class="cf-group"><label>Title</label><input id="cf-s3t" value="Programme Director" oninput="renderCert()"></div></div>
+            -->
+              <div class="cf-section">Customise</div>
+              <div class="toggle-row"><label>Show Watermark</label><div class="toggle on" id="t-wm" onclick="toggleCertOpt(this,'wm')"></div></div>
+              <div class="toggle-row"><label>Show Official Seal</label><div class="toggle on" id="t-seal" onclick="toggleCertOpt(this,'seal')"></div></div>
+              <div class="toggle-row"><label>Show NQF Bar</label><div class="toggle on" id="t-nqfbar" onclick="toggleCertOpt(this,'nqfbar')"></div></div>
+              <div class="cf-group">
+                <label>Background Colour</label>
+                <div class="color-row">
+                  <div class="cswatch active" style="background:#FDFAF3" onclick="setCertBg('#FDFAF3',this)"></div>
+                  <div class="cswatch" style="background:#FFFFFF" onclick="setCertBg('#FFFFFF',this)"></div>
+                  <div class="cswatch" style="background:#EEF4FB" onclick="setCertBg('#EEF4FB',this)"></div>
+                  <div class="cswatch" style="background:#F5F0E8" onclick="setCertBg('#F5F0E8',this)"></div>
+                  <div class="cswatch" style="background:#001624;border:1px solid #444" onclick="setCertBg('#001624',this)"></div>
+                </div>
+              </div>
+
+              <div class="cert-actions">
+                <button class="cta-btn cta-primary" onclick="printCert()">🖨️ Print / Save as PDF</button>
+                <button class="cta-btn cta-secondary" onclick="autoCertNo()">🔄 Auto Cert Number</button>
+                <button class="cta-btn cta-ghost" onclick="fillFromProfile()">👤 Fill from Profile</button>
+              </div>
+            </div>
+          </div>
+
+            <div class="cert-preview-wrap">
+              <div class="preview-toolbar">
+                <span class="pt-label">Live Preview</span>
+                <div class="pt-scales">
+                  <button class="scale-btn active" onclick="setCertScale(1,this)">100%</button>
+                  <button class="scale-btn" onclick="setCertScale(.75,this)">75%</button>
+                  <button class="scale-btn" onclick="setCertScale(.5,this)">50%</button>
+                </div>
+              </div>
+              <div class="cert-wrap" id="cert-wrap">
+                <div id="certificate">
+                  <div class="cert-bg"></div>
+                  <div id="cert-wm" class="cert-watermark">WITS</div>
+                  <div class="cert-border-outer"></div>
+                  <div class="cert-border-inner"></div>
+                  <div id="cert-nqfbar" class="cert-nqf-strip"></div>
+
+                  <div class="cert-corner tl"><svg viewBox="0 0 110 110" fill="none"><path d="M8 8 L8 50 M8 8 L50 8" stroke="#C8A84B" stroke-width="2"/><path d="M16 16 L16 44 M16 16 L44 16" stroke="#C8A84B" stroke-width=".5" opacity=".5"/><circle cx="8" cy="8" r="3" fill="#C8A84B"/><circle cx="50" cy="8" r="1.5" fill="#C8A84B" opacity=".6"/><circle cx="8" cy="50" r="1.5" fill="#C8A84B" opacity=".6"/><path d="M24 8 Q26 13 28 8 Q30 3 32 8 Q34 13 36 8 Q38 3 40 8" stroke="#C8A84B" stroke-width=".8" fill="none" opacity=".4"/></svg></div>
+                  <div class="cert-corner tr"></div>
+                  <div class="cert-corner bl"></div>
+                  <div class="cert-corner br"></div>
+
+                  <div id="cert-seal" class="cert-seal"><svg viewBox="0 0 68 68" fill="none"><circle cx="34" cy="34" r="32" stroke="#003B5C" stroke-width="1.5" fill="rgba(200,168,75,.06)"/><circle cx="34" cy="34" r="28" stroke="#C8A84B" stroke-width=".5"/><g fill="#C8A84B" opacity=".6"><circle cx="34" cy="3" r="1.1"/><circle cx="34" cy="65" r="1.1"/><circle cx="3" cy="34" r="1.1"/><circle cx="65" cy="34" r="1.1"/><circle cx="11" cy="11" r=".9"/><circle cx="57" cy="11" r=".9"/><circle cx="11" cy="57" r=".9"/><circle cx="57" cy="57" r=".9"/></g><text x="34" y="22" text-anchor="middle" font-family="Sora,sans-serif" font-size="4.5" fill="#003B5C" font-weight="600" letter-spacing="1.5">WITS UNIVERSITY</text><polygon points="34,24 36,30 42,30 37.5,34 39.5,40 34,36 28.5,40 30.5,34 26,30 32,30" fill="none" stroke="#C8A84B" stroke-width="1"/><text x="34" y="48" text-anchor="middle" font-family="Sora,sans-serif" font-size="4" fill="#003B5C" font-weight="500" letter-spacing=".8">BUSINESS INTELLIGENCE</text><text x="34" y="54" text-anchor="middle" font-family="Sora,sans-serif" font-size="4" fill="#003B5C" font-weight="500" letter-spacing=".8">SERVICES OFFICE</text><text x="34" y="60" text-anchor="middle" font-family="Lora,serif" font-size="4.5" fill="#C8A84B" font-style="italic">Est. 2024</text></svg></div>
+                  <div class="cert-certno" id="cert-certno-disp">Cert No: —</div>
+
+                  <div class="cert-content">
+                    <div class="cc-crest"><svg viewBox="0 0 64 64" fill="none"><polygon points="32,3 37,24 60,24 42,37 49,58 32,45 15,58 22,37 4,24 27,24" fill="none" stroke="#C8A84B" stroke-width="1.5"/><polygon points="32,10 36,22 48,22 38.5,29.5 42,42 32,35 22,42 25.5,29.5 16,22 28,22" fill="rgba(200,168,75,.1)"/><text x="32" y="34" text-anchor="middle" font-family="Lora,serif" font-size="13" font-weight="700" fill="#003B5C">W</text></svg></div>
+                    <div class="cc-inst">UNIVERSITY OF THE WITWATERSRAND</div>
+                    <div class="cc-division">Business Intelligence Services</div>
+                    <div class="cc-rule"><div class="cc-rule-line"></div><div class="cc-rule-diamond"></div><div class="cc-rule-line"></div></div>
+                    <div class="cc-presents">Proudly Certifies That</div>
+                    <div class="cc-name" id="cc-name">Recipient Name</div>
+                    <div class="cc-designation" id="cc-designation">Designation · Faculty</div>
+                    <div class="cc-has-completed">Has Successfully Completed</div>
+                    <div class="cc-programme" id="cc-programme">Data Literacy for Data Champions</div>
+                    <div class="cc-subtitle">A Short Learning Programme in Academic Data Analytics &amp; Student Success</div>
+                    <div class="cc-rule" style="margin-bottom:16px"><div class="cc-rule-line"></div><div class="cc-rule-diamond"></div><div class="cc-rule-line"></div></div>
+                    <div class="cc-details">
+                      <div class="cc-detail"><div class="cc-detail-label">NQF Level &amp; Credits</div><div class="cc-detail-val" id="cc-nqf">NQF Level 7 · 8 Credits</div></div>
+                      <div class="cc-detail"><div class="cc-detail-label">Date of Completion</div><div class="cc-detail-val" id="cc-date">—</div></div>
+                      <div class="cc-detail"><div class="cc-detail-label">Faculty / Division</div><div class="cc-detail-val" id="cc-faculty" style="font-size:13px">—</div></div>
+                      <div class="cc-detail"><div class="cc-detail-label">Grade Awarded</div><div class="cc-grade-badge" id="cc-grade">Merit</div></div>
+                    </div>
+                    <div class="cc-sigs">
+                      <div class="cc-sig-block"><div class="cc-sig-name" id="cc-s1n">Mr Innocent Mamvura </div><div class="cc-sig-title" id="cc-s1t">Program Director</div></div>
+                     <!-- <div class="cc-sig-block"><div class="cc-sig-name" id="cc-s2n">Dr T. Mokoena</div><div class="cc-sig-title" id="cc-s2t">Head, BISO</div></div>
+                      <div class="cc-sig-block"><div class="cc-sig-name" id="cc-s3n">Dr P. Sithole</div><div class="cc-sig-title" id="cc-s3t">Programme Director</div></div> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="view" id="view-references">
+          <div class="section-card animate-in">
+            <h2>References &amp; Further Reading</h2>
+            <div id="refs-list" style="display:flex;flex-direction:column;gap:6px;margin-top:4px"></div>
+          </div>
+        </div>
+
+        <div class="view" id="view-admin">
+          <div id="admin-view-overview" class="admin-view active"></div>
+          <div id="admin-view-users" class="admin-view"></div>
+          <div id="admin-view-progress" class="admin-view"></div>
+          <div id="admin-view-survey" class="admin-view"></div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"><span>✓</span><span id="toast-msg">Done</span></div>
+
+  <script src="js/config.js"></script>
+  <script src="js/utils/constants.js"></script>
+  <script src="js/utils/helpers.js"></script>
+
+  <script src="js/services/supabase.js"></script>
+  <script src="js/services/storage.js"></script>
+
+  <script src="js/modules/auth.js"></script>
+  <script src="js/modules/ui.js"></script>
+  <script src="js/modules/dashboard.js"></script>
+  <script src="js/modules/lessons.js"></script>
+  <script src="js/modules/quiz.js"></script>
+  <script src="js/modules/lab.js"></script>
+  <script src="js/modules/certificate.js"></script>
+  <script src="js/modules/admin.js"></script>
+  <script src="js/modules/survey.js"></script>
+
+  <script src="js/main.js"></script>
+
+</body>
+</html>

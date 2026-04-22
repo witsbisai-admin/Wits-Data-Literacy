@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wits Data Literacy Platform — Complete Deployment Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#003B5C;--gold:#C8A84B;--gold-pale:#FBF5E0;--navy:#001624;--green:#1A7F5A;--green-bg:#E6F5EF;--red:#C0392B;--red-bg:#FDECEA;--amber:#B7791F;--purple:#7C3AED;--purple-bg:#F5F0FF;--border:#DDE6F0;--bg:#F0F4F9;--mid:#4A5568;--light:#8A9BB0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sora',sans-serif;background:#fff;color:#0D1B2A;line-height:1.7;font-size:14px}
+.cover{background:linear-gradient(135deg,var(--navy) 0%,#003B5C 55%,#001a2e 100%);padding:56px 60px 48px;position:relative;overflow:hidden}
+.cover::after{content:'';position:absolute;right:-50px;top:-50px;width:280px;height:280px;background:radial-gradient(circle,rgba(200,168,75,.15) 0%,transparent 70%)}
+.cover-logo{display:flex;align-items:center;gap:14px;margin-bottom:36px}
+.lsq{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--gold),#E8C96B);display:flex;align-items:center;justify-content:center;font-family:'Lora',serif;font-size:22px;font-weight:700;color:var(--navy)}
+.lt .t1{font-size:15px;font-weight:700;color:#fff}.lt .t2{font-size:10px;color:rgba(200,168,75,.7);margin-top:2px}
+.cover h1{font-family:'Lora',serif;font-size:34px;font-weight:600;color:#fff;margin-bottom:8px;position:relative;z-index:1;line-height:1.25}
+.cover .sub{font-size:14px;color:rgba(255,255,255,.55);margin-bottom:28px;position:relative;z-index:1}
+.cover-pills{display:flex;gap:10px;flex-wrap:wrap;position:relative;z-index:1}
+.pill{background:rgba(255,255,255,.08);border:1px solid rgba(200,168,75,.25);border-radius:20px;padding:5px 14px;font-size:11.5px;color:rgba(255,255,255,.7)}
+.pill strong{color:#E8C96B}
+.wrap{max-width:920px;margin:0 auto;padding:44px 44px}
+h1{font-family:'Lora',serif;font-size:28px;color:var(--blue);margin:48px 0 16px;padding-bottom:10px;border-bottom:3px solid var(--gold)}
+h2{font-family:'Lora',serif;font-size:21px;color:var(--blue);margin:32px 0 12px}
+h3{font-size:15px;font-weight:700;color:#0D1B2A;margin:22px 0 8px}
+h4{font-size:12.5px;font-weight:700;color:var(--mid);margin:14px 0 5px;text-transform:uppercase;letter-spacing:.07em}
+p{margin-bottom:10px;color:var(--mid);font-size:13.5px}
+ul,ol{padding-left:22px;margin-bottom:12px}
+li{margin-bottom:5px;color:var(--mid);font-size:13.5px;line-height:1.6}
+code{font-family:'JetBrains Mono',monospace;font-size:11.5px;background:var(--bg);padding:2px 6px;border-radius:4px;color:var(--blue)}
+pre{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--navy);color:rgba(200,168,75,.9);padding:18px 22px;border-radius:10px;overflow-x:auto;margin:12px 0;line-height:1.7;white-space:pre}
+pre .c{color:rgba(255,255,255,.3);font-style:italic}
+.step{display:flex;gap:14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:15px 18px;margin:10px 0;align-items:flex-start}
+.snum{min-width:30px;height:30px;border-radius:8px;background:var(--blue);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.snum.purple{background:var(--purple)}
+.snum.green{background:var(--green)}
+.snum.gold{background:var(--amber)}
+.sbody h4{font-size:13.5px;font-weight:600;color:#0D1B2A;margin:0 0 4px;text-transform:none;letter-spacing:0}
+.sbody p{margin:0;font-size:13px}
+.ibox{border-radius:9px;padding:13px 16px;margin:14px 0;border-left:4px solid}
+.ibox.blue{background:#EEF4FB;border-color:var(--blue)}
+.ibox.gold{background:var(--gold-pale);border-color:var(--gold)}
+.ibox.green{background:var(--green-bg);border-color:var(--green)}
+.ibox.red{background:var(--red-bg);border-color:var(--red)}
+.ibox.purple{background:var(--purple-bg);border-color:var(--purple)}
+.ibox .it{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px}
+.ibox.blue .it{color:var(--blue)}.ibox.gold .it{color:var(--amber)}.ibox.green .it{color:var(--green)}.ibox.red .it{color:var(--red)}.ibox.purple .it{color:var(--purple)}
+.ibox p,.ibox li{font-size:13px;margin-bottom:3px;color:var(--mid)}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px}
+th{background:var(--blue);color:#fff;padding:9px 12px;text-align:left;font-size:11px;font-weight:600;letter-spacing:.05em}
+td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--mid);vertical-align:top}
+tr:nth-child(even) td{background:#F8FAFD}
+.tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600}
+.tg{background:var(--green-bg);color:var(--green)}
+.tr{background:var(--red-bg);color:var(--red)}
+.to{background:var(--gold-pale);color:var(--amber)}
+.tp{background:var(--purple-bg);color:var(--purple)}
+.option-header{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,var(--blue),#005a8e);border-radius:12px;padding:22px 26px;margin:28px 0 20px;color:#fff}
+.option-icon{font-size:32px;flex-shrink:0}
+.option-header h2{font-family:'Lora',serif;font-size:22px;margin:0;color:#fff}
+.option-header p{font-size:12.5px;color:rgba(255,255,255,.65);margin:4px 0 0}
+.option-header.purple{background:linear-gradient(135deg,var(--purple),#6D28D9)}
+.option-header.green{background:linear-gradient(135deg,var(--green),#22A870)}
+.option-header.gold{background:linear-gradient(135deg,#92400E,var(--amber))}
+.option-header.teal{background:linear-gradient(135deg,#0E7490,#0891B2)}
+.file-tree{background:var(--navy);border-radius:10px;padding:18px 22px;font-family:'JetBrains Mono',monospace;font-size:12px;color:rgba(200,168,75,.85);line-height:1.8;margin:14px 0;white-space:pre}
+.file-tree .dir{color:#93C5FD}
+.file-tree .file{color:rgba(200,168,75,.85)}
+.file-tree .note{color:rgba(255,255,255,.3);font-style:italic}
+.admin-box{background:linear-gradient(135deg,#1E0A3C,#4C1D95);border-radius:12px;padding:22px 26px;margin:20px 0}
+.admin-box h3{color:#C4B5FD;font-size:16px;margin-bottom:12px}
+.admin-row{display:grid;grid-template-columns:140px 1fr;gap:8px;margin-bottom:8px;align-items:center}
+.admin-row .lbl{font-size:11px;font-weight:600;color:rgba(196,181,253,.6);text-transform:uppercase;letter-spacing:.1em}
+.admin-row .val{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#E8C96B;background:rgba(255,255,255,.06);padding:6px 14px;border-radius:7px;border:1px solid rgba(200,168,75,.2);letter-spacing:.05em}
+.admin-box p{font-size:12px;color:rgba(255,255,255,.4);margin-top:10px}
+.toc a{color:var(--blue);text-decoration:none}.toc a:hover{text-decoration:underline}
+.toc li{margin-bottom:7px}
+@media print{
+  .cover{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .option-header,.admin-box,.file-tree,pre{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  h1{page-break-before:always}
+}
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="cover-logo">
+    <div class="lsq">W</div>
+    <div class="lt"><div class="t1">University of the Witwatersrand</div><div class="t2">Business Intelligence Services</div></div>
+  </div>
+  <h1>Complete Deployment Guide<br>Data Literacy Platform v4</h1>
+  <div class="sub">Source code structure · All deployment options A–D · Admin credentials · Troubleshooting</div>
+  <div class="cover-pills">
+    <div class="pill"><strong>Version</strong> 4.0 — Fixed &amp; Final</div>
+    <div class="pill"><strong>Options</strong> Docker · nginx · Static · Canvas</div>
+    <div class="pill"><strong>Stack</strong> Single-file HTML · No backend required</div>
+    <div class="pill"><strong>NQF</strong> Level 7 · 12 Contact Hours · 8 Credits</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- TOC ──────────────────────────────────────────────── -->
+<h1 style="margin-top:0">Contents</h1>
+<ol class="toc">
+  <li><a href="#platform">Platform Overview &amp; Architecture</a></li>
+  <li><a href="#files">All Deployment Files Explained</a></li>
+  <li><a href="#admin">Admin Login Credentials</a></li>
+  <li><a href="#optA">Option A — Docker (Recommended)</a></li>
+  <li><a href="#optB">Option B — Bare nginx on Ubuntu/Debian</a></li>
+  <li><a href="#optC">Option C — Static Hosting (Netlify / Vercel / GitHub Pages)</a></li>
+  <li><a href="#optD">Option D — Canvas LMS Integration</a></li>
+  <li><a href="#ssl">SSL / HTTPS Setup</a></li>
+  <li><a href="#update">Updating the Platform</a></li>
+  <li><a href="#troubleshoot">Troubleshooting</a></li>
+</ol>
+
+<!-- 1. OVERVIEW ──────────────────────────────────────── -->
+<h1 id="platform">1. Platform Overview &amp; Architecture</h1>
+
+<p>The platform is a <strong>single self-contained HTML file</strong> (~280 KB). It contains all CSS, JavaScript, content, lab data, quizzes, and the certificate generator — with no external dependencies except Google Fonts (which gracefully degrade if unavailable). There is no database, no server-side code, and no build step.</p>
+
+<table>
+  <thead><tr><th>Layer</th><th>Technology</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Frontend</strong></td><td>Vanilla HTML5 + CSS3 + JavaScript (ES6+)</td><td>No frameworks. No npm. No build step.</td></tr>
+    <tr><td><strong>Styling</strong></td><td>CSS custom properties + Google Fonts (Sora, Lora, JetBrains Mono)</td><td>Fonts load from CDN; fall back to system fonts if blocked.</td></tr>
+    <tr><td><strong>Data persistence</strong></td><td><code>localStorage</code> + <code>sessionStorage</code></td><td>Per-user, per-browser. No cross-device sync without a backend.</td></tr>
+    <tr><td><strong>Auth</strong></td><td>Client-side accounts stored in <code>localStorage</code></td><td>Suitable for internal/trusted environments. Not cryptographic.</td></tr>
+    <tr><td><strong>Web server</strong></td><td>nginx (recommended) or any static file server</td><td>Even Python's <code>http.server</code> works for local testing.</td></tr>
+  </tbody>
+</table>
+
+<div class="ibox gold">
+  <div class="it">⚡ Key Insight</div>
+  <p>Because the entire platform is one HTML file, deployment is simply: <strong>put <code>index.html</code> somewhere that serves it over HTTP/HTTPS</strong>. Every option below does exactly this, with varying degrees of production hardening.</p>
+</div>
+
+<!-- 2. FILES ──────────────────────────────────────────── -->
+<h1 id="files">2. All Deployment Files Explained</h1>
+
+<div class="file-tree"><span class="dir">wits-complete-package/</span>
+<span class="dir">├── platform/</span>
+<span class="file">│   └── index.html</span>              <span class="note">← THE PLATFORM (entire app, 280 KB)</span>
+<span class="dir">│</span>
+<span class="dir">├── docker/</span>
+<span class="file">│   ├── Dockerfile</span>              <span class="note">← Builds nginx:alpine image with platform</span>
+<span class="file">│   └── docker-compose.yml</span>      <span class="note">← Orchestrates container (ports, volumes, health)</span>
+<span class="dir">│</span>
+<span class="dir">├── nginx/</span>
+<span class="file">│   ├── nginx.conf</span>              <span class="note">← Main nginx config (gzip, security headers)</span>
+<span class="file">│   ├── default.conf</span>            <span class="note">← Virtual host (set domain here, SSL lines ready)</span>
+<span class="file">│   └── wits-platform.service</span>   <span class="note">← systemd service file for bare nginx</span>
+<span class="dir">│</span>
+<span class="dir">├── canvas/</span>
+<span class="file">│   ├── canvas-iframe-embed.html</span> <span class="note">← Paste into Canvas HTML editor</span>
+<span class="file">│   └── CANVAS_INTEGRATION.py</span>   <span class="note">← Full Canvas integration guide (all 3 methods)</span>
+<span class="dir">│</span>
+<span class="file">├── netlify.toml</span>                <span class="note">← Netlify config (auto-detected on deploy)</span>
+<span class="file">├── vercel.json</span>                 <span class="note">← Vercel config (auto-detected on deploy)</span>
+<span class="file">├── .github/workflows/deploy.yml</span> <span class="note">← GitHub Pages auto-deploy on git push</span>
+<span class="file">├── deploy.sh</span>                   <span class="note">← One-command: --docker | --nginx | --update | --ssl</span>
+<span class="file">├── .env.example</span>               <span class="note">← Copy to .env, fill in domain + email</span>
+<span class="file">└── .gitignore</span>                  <span class="note">← Keeps .env and certs out of git</span></div>
+
+<!-- 3. ADMIN ──────────────────────────────────────────── -->
+<h1 id="admin">3. Admin Login Credentials</h1>
+
+<div class="admin-box">
+  <h3>🔐 Administrator Account</h3>
+  <div class="admin-row"><span class="lbl">Email</span><span class="val">admin@wits.ac.za</span></div>
+  <div class="admin-row"><span class="lbl">Password</span><span class="val">WitsBISO@2025!</span></div>
+  <div class="admin-row"><span class="lbl">Role</span><span class="val">Platform Administrator</span></div>
+  <div class="admin-row"><span class="lbl">Access</span><span class="val">Full Admin Panel · User Mgmt · Progress Reports</span></div>
+  <p>⚠️ Change this password immediately after first login: Admin Panel → User Management → find admin@wits.ac.za → Reset Password. The account is seeded automatically on first page load.</p>
+</div>
+
+<h3>Admin Panel Features</h3>
+<table>
+  <thead><tr><th>Section</th><th>What You Can Do</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Overview Dashboard</strong></td><td>KPI cards (enrolled, active, completed, avg progress), unit completion bar charts, faculty enrolment breakdown, recent learner activity table</td></tr>
+    <tr><td><strong>User Management</strong></td><td>Search all learners, view individual progress, reset any user's password, delete accounts</td></tr>
+    <tr><td><strong>Progress Reports</strong></td><td>Per-unit content/quiz/lab completion rates, quiz score breakdown per learner, certificate eligibility status</td></tr>
+    <tr><td><strong>Forgot Password</strong></td><td>Learners self-serve: enter email → get reset code → enter code + new password</td></tr>
+  </tbody>
+</table>
+
+<!-- OPTION A ──────────────────────────────────────────── -->
+<h1 id="optA">4. Option A — Docker (Recommended)</h1>
+<div class="option-header">
+  <div class="option-icon">🐳</div>
+  <div>
+    <h2>Docker Deployment</h2>
+    <p>Best for: cloud VMs, university servers, consistent reproducible environments · ~5 min setup</p>
+  </div>
+</div>
+
+<h3>Tools Required</h3>
+<table>
+  <thead><tr><th>Tool</th><th>Version</th><th>Install Command</th><th>Required</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Docker Engine</strong></td><td>24.x+</td><td><code>curl -fsSL https://get.docker.com | bash</code></td><td><span class="tag tg">Required</span></td></tr>
+    <tr><td><strong>Docker Compose</strong></td><td>v2.x+</td><td><code>apt install docker-compose-plugin</code></td><td><span class="tag tg">Required</span></td></tr>
+    <tr><td><strong>Certbot</strong></td><td>Latest</td><td><code>snap install --classic certbot</code></td><td><span class="tag to">HTTPS only</span></td></tr>
+  </tbody>
+</table>
+
+<div class="step"><div class="snum">1</div><div class="sbody"><h4>Install Docker on your server</h4>
+<pre><span class="c"># One-line install (official Docker script)</span>
+curl -fsSL https://get.docker.com | bash
+
+<span class="c"># Add your user to docker group (avoids needing sudo)</span>
+sudo usermod -aG docker $USER && newgrp docker
+
+<span class="c"># Verify</span>
+docker --version          <span class="c"># Docker version 24.x.x</span>
+docker compose version    <span class="c"># Docker Compose version v2.x.x</span></pre>
+</div></div>
+
+<div class="step"><div class="snum">2</div><div class="sbody"><h4>Upload the package to your server</h4>
+<pre><span class="c"># From your local machine via SCP:</span>
+scp -r ./wits-complete-package  user@YOUR-SERVER-IP:/home/user/
+
+<span class="c"># Or clone from a git repo:</span>
+git clone https://github.com/your-org/wits-deploy.git
+
+<span class="c"># Or SFTP using FileZilla / WinSCP / Cyberduck</span></pre>
+</div></div>
+
+<div class="step"><div class="snum">3</div><div class="sbody"><h4>Set your domain in nginx/default.conf</h4>
+<pre><span class="c"># Open the config</span>
+nano nginx/default.conf
+
+<span class="c"># Find and change:</span>
+server_name localhost;
+
+<span class="c"># To your actual domain (examples):</span>
+server_name datalit.wits.ac.za;
+server_name biso-platform.wits.ac.za;</pre>
+</div></div>
+
+<div class="step"><div class="snum">4</div><div class="sbody"><h4>Build and start the container</h4>
+<pre>cd wits-complete-package/docker
+
+<span class="c"># Build image and start container in background</span>
+docker compose up -d --build
+
+<span class="c"># Check it's running</span>
+docker compose ps
+<span class="c"># Expected:  wits_platform   Up 30 seconds   0.0.0.0:80->80/tcp</span>
+
+<span class="c"># Verify health endpoint</span>
+curl http://localhost/health
+<span class="c"># Expected: healthy</span></pre>
+</div></div>
+
+<div class="step"><div class="snum">5</div><div class="sbody"><h4>Open firewall ports</h4>
+<pre>sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw status
+
+<span class="c"># On AWS/Azure/GCP: also open ports in your</span>
+<span class="c"># Security Group / Firewall Rules in the cloud console</span></pre>
+</div></div>
+
+<div class="ibox green">
+  <div class="it">✅ Success Indicators</div>
+  <ul>
+    <li><code>docker compose ps</code> shows <strong>Up</strong> with health <strong>healthy</strong></li>
+    <li><code>curl http://localhost/health</code> returns <code>healthy</code></li>
+    <li>Browser at <code>http://your-server-ip</code> shows the Wits sign-in screen</li>
+  </ul>
+</div>
+
+<h3>Useful Docker Commands</h3>
+<pre><span class="c"># View live logs</span>
+docker logs -f wits_platform
+
+<span class="c"># Stop</span>
+docker compose down
+
+<span class="c"># Restart after config change</span>
+docker compose restart platform
+
+<span class="c"># Update platform HTML (zero downtime)</span>
+docker cp platform/index.html wits_platform:/usr/share/nginx/html/index.html
+docker exec wits_platform nginx -s reload
+
+<span class="c"># Full rebuild after Dockerfile change</span>
+docker compose up -d --build</pre>
+
+<!-- OPTION B ──────────────────────────────────────────── -->
+<h1 id="optB">5. Option B — Bare nginx on Ubuntu/Debian</h1>
+<div class="option-header green">
+  <div class="option-icon">🐧</div>
+  <div>
+    <h2>Bare nginx on Ubuntu/Debian</h2>
+    <p>Best for: existing Ubuntu servers without Docker, traditional sysadmin setups</p>
+  </div>
+</div>
+
+<div class="step"><div class="snum snum" style="background:var(--green)">1</div><div class="sbody"><h4>Install nginx</h4>
+<pre>sudo apt update && sudo apt install nginx -y
+sudo systemctl enable nginx
+sudo systemctl start nginx
+nginx -v   <span class="c"># nginx version: nginx/1.18.0 (or newer)</span></pre>
+</div></div>
+
+<div class="step"><div class="snum" style="background:var(--green)">2</div><div class="sbody"><h4>Copy platform file to web root</h4>
+<pre>sudo mkdir -p /var/www/wits-platform
+sudo cp platform/index.html /var/www/wits-platform/index.html
+sudo chown -R www-data:www-data /var/www/wits-platform</pre>
+</div></div>
+
+<div class="step"><div class="snum" style="background:var(--green)">3</div><div class="sbody"><h4>Install nginx configuration</h4>
+<pre>sudo cp nginx/nginx.conf /etc/nginx/nginx.conf
+
+<span class="c"># Copy virtual host config with correct root path</span>
+sudo sed 's|root  /usr/share/nginx/html;|root /var/www/wits-platform;|g' \
+    nginx/default.conf > /etc/nginx/sites-available/wits-platform
+
+<span class="c"># Set your domain</span>
+sudo nano /etc/nginx/sites-available/wits-platform
+<span class="c"># Change: server_name localhost;  →  server_name your-domain.wits.ac.za;</span>
+
+<span class="c"># Enable site, disable default</span>
+sudo ln -sf /etc/nginx/sites-available/wits-platform /etc/nginx/sites-enabled/
+sudo rm -f /etc/nginx/sites-enabled/default
+
+<span class="c"># Test and reload</span>
+sudo nginx -t && sudo systemctl reload nginx</pre>
+</div></div>
+
+<div class="step"><div class="snum" style="background:var(--green)">4</div><div class="sbody"><h4>Open firewall</h4>
+<pre>sudo ufw allow 'Nginx Full'
+sudo ufw enable
+sudo ufw status</pre>
+</div></div>
+
+<div class="step"><div class="snum" style="background:var(--green)">5</div><div class="sbody"><h4>Install systemd service (optional — for auto-start on reboot)</h4>
+<pre>sudo cp nginx/wits-platform.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable wits-platform</pre>
+</div></div>
+
+<h3>Useful nginx Commands</h3>
+<pre>sudo nginx -t               <span class="c"># Test config syntax</span>
+sudo nginx -s reload         <span class="c"># Reload config without downtime</span>
+sudo systemctl restart nginx <span class="c"># Full restart</span>
+sudo systemctl status nginx  <span class="c"># Check status</span>
+sudo tail -f /var/log/nginx/access.log   <span class="c"># Live access log</span>
+sudo tail -f /var/log/nginx/error.log    <span class="c"># Live error log</span></pre>
+
+<!-- OPTION C ──────────────────────────────────────────── -->
+<h1 id="optC">6. Option C — Static Hosting</h1>
+<div class="option-header gold">
+  <div class="option-icon">☁️</div>
+  <div>
+    <h2>Static Hosting (Netlify / Vercel / GitHub Pages)</h2>
+    <p>Best for: fastest setup, zero server management, free tier available · 2–5 min</p>
+  </div>
+</div>
+
+<div class="ibox gold">
+  <div class="it">⚡ Why This Works</div>
+  <p>The platform is entirely self-contained — no server-side logic, no database calls. Any static file host can serve it. All authentication and data storage happen in the learner's browser (<code>localStorage</code>).</p>
+</div>
+
+<h2>Netlify (Easiest — Recommended)</h2>
+<div class="step"><div class="snum snum" style="background:var(--amber)">1</div><div class="sbody"><h4>Create free account at netlify.com</h4><p>Sign up with GitHub, GitLab, email, or Google. No credit card needed.</p></div></div>
+<div class="step"><div class="snum" style="background:var(--amber)">2</div><div class="sbody"><h4>Create new site → Deploy manually</h4><p>Dashboard → <strong>Add new site</strong> → <strong>Deploy manually</strong>.</p></div></div>
+<div class="step"><div class="snum" style="background:var(--amber)">3</div><div class="sbody"><h4>Drag and drop the platform folder</h4><p>Drag the entire <code>platform/</code> folder (containing <code>index.html</code>) onto the Netlify drop zone. <strong>Do not drag the file directly</strong> — drag the folder.</p></div></div>
+<div class="step"><div class="snum" style="background:var(--amber)">4</div><div class="sbody"><h4>Get your URL</h4><p>Netlify instantly provides a URL like <code>random-name.netlify.app</code>. The platform is live.</p></div></div>
+<div class="step"><div class="snum" style="background:var(--amber)">5</div><div class="sbody"><h4>Add custom domain (optional)</h4>
+<pre><span class="c"># In Netlify: Site Settings → Domain Management → Add custom domain</span>
+<span class="c"># Enter: datalit.wits.ac.za</span>
+<span class="c"># Follow DNS instructions → HTTPS is configured automatically</span></pre>
+</div></div>
+<div class="step"><div class="snum" style="background:var(--amber)">6</div><div class="sbody"><h4>For CI/CD auto-deploy on git push:</h4>
+<pre><span class="c"># Install Netlify CLI</span>
+npm install -g netlify-cli
+
+<span class="c"># Link repo and deploy</span>
+netlify link
+netlify deploy --prod --dir ./platform</pre>
+</div></div>
+
+<h2>Vercel</h2>
+<pre><span class="c"># Install Vercel CLI</span>
+npm install -g vercel
+
+<span class="c"># Deploy from the project root (vercel.json tells it where index.html is)</span>
+vercel --prod
+
+<span class="c"># Or via dashboard: vercel.com → New Project → Import → deploy</span></pre>
+
+<h2>GitHub Pages</h2>
+<pre><span class="c"># 1. Create a GitHub repository and push this project</span>
+git init && git add . && git commit -m "Initial deploy"
+git remote add origin https://github.com/YOUR-ORG/wits-datalit.git
+git push -u origin main
+
+<span class="c"># 2. In GitHub: Settings → Pages → Source → GitHub Actions</span>
+<span class="c"># 3. The workflow file (.github/workflows/deploy.yml) runs automatically</span>
+<span class="c"># 4. Platform available at: https://YOUR-ORG.github.io/wits-datalit/</span></pre>
+
+<table>
+  <thead><tr><th>Service</th><th>Free Tier</th><th>Custom Domain</th><th>HTTPS</th><th>Best For</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Netlify</strong></td><td>Unlimited bandwidth</td><td>Free</td><td>Auto</td><td>Easiest drag-and-drop</td></tr>
+    <tr><td><strong>Vercel</strong></td><td>100 GB bandwidth/mo</td><td>Free</td><td>Auto</td><td>Developer-friendly CLI</td></tr>
+    <tr><td><strong>GitHub Pages</strong></td><td>Unlimited public repos</td><td>Free</td><td>Auto</td><td>Git-integrated auto-deploy</td></tr>
+    <tr><td><strong>Cloudflare Pages</strong></td><td>Unlimited bandwidth</td><td>Free</td><td>Auto</td><td>Fastest global CDN</td></tr>
+  </tbody>
+</table>
+
+<!-- OPTION D ──────────────────────────────────────────── -->
+<h1 id="optD">7. Option D — Canvas LMS Integration</h1>
+<div class="option-header teal">
+  <div class="option-icon">🎓</div>
+  <div>
+    <h2>Canvas LMS Integration</h2>
+    <p>Best for: institutions using Canvas as their primary LMS — embeds platform directly in a Canvas course</p>
+  </div>
+</div>
+
+<div class="ibox blue">
+  <div class="it">Three Methods</div>
+  <ul>
+    <li><strong>Method 1 — Redirect Tool</strong>: links to hosted platform in a new tab. 5 min, no IT needed.</li>
+    <li><strong>Method 2 — iFrame Embed</strong>: embeds platform inline in a Canvas Page. 10 min, may need domain whitelist.</li>
+    <li><strong>Method 3 — LTI 1.3</strong>: full grade passback to Canvas gradebook. Requires backend server + Canvas admin.</li>
+  </ul>
+</div>
+
+<h2>Method 1 — Redirect Tool (5 minutes, no IT needed)</h2>
+<div class="step"><div class="snum snum" style="background:#0891B2">1</div><div class="sbody"><h4>First deploy the platform using any of Options A, B, or C to get a URL</h4><p>You need a live URL such as <code>https://wits-datalit.netlify.app</code> or <code>https://datalit.wits.ac.za</code>.</p></div></div>
+<div class="step"><div class="snum" style="background:#0891B2">2</div><div class="sbody"><h4>In Canvas: Course → Settings → Apps → View App Configurations → + App</h4></div></div>
+<div class="step"><div class="snum" style="background:#0891B2">3</div><div class="sbody"><h4>Select "By URL" configuration type and fill in:</h4>
+<pre>Name:          Data Literacy for Data Champions
+Consumer Key:  wits-datalit
+Shared Secret: wits2025
+Launch URL:    https://YOUR-DEPLOYED-URL.com</pre>
+</div></div>
+<div class="step"><div class="snum" style="background:#0891B2">4</div><div class="sbody"><h4>Add to Modules: + → External Tool → select the tool → Add Item</h4><p>Learners click it and the platform opens in a new browser tab.</p></div></div>
+
+<h2>Method 2 — iFrame Embed in Canvas Page (10 minutes)</h2>
+<div class="step"><div class="snum" style="background:#0891B2">1</div><div class="sbody"><h4>Deploy the platform (Option A, B, or C) to get a live URL</h4></div></div>
+<div class="step"><div class="snum" style="background:#0891B2">2</div><div class="sbody"><h4>In Canvas course: Pages → + Page → title it "Data Literacy Platform"</h4></div></div>
+<div class="step"><div class="snum" style="background:#0891B2">3</div><div class="sbody"><h4>Click HTML editor (&lt;/&gt;) and paste the iframe code from <code>canvas/canvas-iframe-embed.html</code></h4>
+<pre><span class="c">&lt;!-- Replace YOUR-PLATFORM-URL with your actual deployed URL --&gt;</span>
+&lt;div style="width:100%;height:88vh;min-height:720px;
+            border-radius:8px;overflow:hidden;
+            box-shadow:0 4px 20px rgba(0,0,0,0.15);"&gt;
+  &lt;iframe
+    src="https://YOUR-PLATFORM-URL.com"
+    width="100%" height="100%"
+    frameborder="0"
+    allow="fullscreen; clipboard-write"
+    sandbox="allow-scripts allow-same-origin allow-forms
+             allow-popups allow-storage-access-by-user-activation"&gt;
+  &lt;/iframe&gt;
+&lt;/div&gt;
+&lt;p style="font-size:12px;color:#888;margin-top:10px"&gt;
+  &lt;a href="https://YOUR-PLATFORM-URL.com" target="_blank"&gt;
+    Open in full window →
+  &lt;/a&gt;
+&lt;/p&gt;</pre>
+</div></div>
+<div class="step"><div class="snum" style="background:#0891B2">4</div><div class="sbody"><h4>Ask Canvas admin to whitelist your domain (if iframe doesn't load)</h4>
+<pre><span class="c"># Canvas Admin → Security → Content Security Policy → Add allowed domains:</span>
+https://YOUR-PLATFORM-DOMAIN.com
+https://fonts.googleapis.com
+https://fonts.gstatic.com</pre>
+</div></div>
+
+<h2>Method 3 — LTI 1.3 (Grade Passback to Canvas Gradebook)</h2>
+<p>LTI 1.3 enables Canvas to pass the learner's verified identity to the platform and receive quiz/completion scores back into the Canvas gradebook automatically.</p>
+<div class="ibox purple">
+  <div class="it">Requirements</div>
+  <ul>
+    <li>A backend server (Node.js or Python) to handle OIDC handshake</li>
+    <li>Canvas admin access to register a Developer Key</li>
+    <li>Recommended library: <strong>ltijs</strong> (Node.js) — <code>npm install ltijs</code></li>
+  </ul>
+</div>
+<div class="step"><div class="snum snum" style="background:var(--purple)">1</div><div class="sbody"><h4>Canvas Admin → Developer Keys → + Developer Key → LTI Key</h4></div></div>
+<div class="step"><div class="snum" style="background:var(--purple)">2</div><div class="sbody"><h4>Configure the LTI Tool with these settings:</h4>
+<pre>Title:               Data Literacy for Data Champions
+Description:         NQF Level 7 SLP — Wits BISO
+Target Link URI:     https://YOUR-PLATFORM-URL.com
+OIDC Initiation URL: https://YOUR-PLATFORM-URL.com/lti/login
+Public JWK URL:      https://YOUR-PLATFORM-URL.com/lti/jwks
+Redirect URIs:       https://YOUR-PLATFORM-URL.com/lti/launch
+
+Placements:
+  - Course Navigation (opens platform in sidebar)
+  - Assignments (allows grade passback)</pre>
+</div></div>
+<div class="step"><div class="snum" style="background:var(--purple)">3</div><div class="sbody"><h4>Add to course: Settings → Apps → + App → By Client ID → paste Developer Key ID</h4></div></div>
+
+<h2>Canvas Comparison</h2>
+<table>
+  <thead><tr><th>Method</th><th>Setup Time</th><th>Grade Passback</th><th>IT Needed</th><th>Best For</th></tr></thead>
+  <tbody>
+    <tr><td><strong>1 — Redirect Tool</strong></td><td>5 min</td><td>No</td><td>No</td><td>Quick access link</td></tr>
+    <tr><td><strong>2 — iFrame Embed</strong></td><td>10 min</td><td>No</td><td>Maybe (whitelist)</td><td>Inline experience</td></tr>
+    <tr><td><strong>3 — LTI 1.3</strong></td><td>2–4 hours</td><td>Yes ✅</td><td>Yes (admin key)</td><td>Full LMS integration</td></tr>
+  </tbody>
+</table>
+
+<!-- SSL ──────────────────────────────────────────────── -->
+<h1 id="ssl">8. SSL / HTTPS Setup (Let's Encrypt — Free)</h1>
+
+<div class="ibox gold"><div class="it">Before You Start</div><ul>
+  <li>Your domain DNS must point to your server IP (verify: <code>nslookup your-domain.wits.ac.za</code>)</li>
+  <li>Port 80 must be open and the platform must be serving HTTP first</li>
+  <li>Not needed for Option C (Netlify/Vercel provide HTTPS automatically)</li>
+</ul></div>
+
+<pre><span class="c"># Install Certbot</span>
+sudo snap install --classic certbot
+sudo ln -sf /snap/bin/certbot /usr/bin/certbot
+
+<span class="c"># Option B (bare nginx) — automatic config update</span>
+sudo certbot --nginx -d your-domain.wits.ac.za
+
+<span class="c"># Option A (Docker) — standalone mode (stops container briefly)</span>
+cd docker && docker compose down
+sudo certbot certonly --standalone -d your-domain.wits.ac.za
+<span class="c"># Then uncomment SSL lines in nginx/default.conf and restart</span>
+docker compose up -d --build
+
+<span class="c"># Test auto-renewal (certificates renew every 90 days automatically)</span>
+sudo certbot renew --dry-run</pre>
+
+<p>After getting the certificate, uncomment the HTTPS server block in <code>nginx/default.conf</code> and the HTTP-to-HTTPS redirect. For Docker, also uncomment the Let's Encrypt volume and port 443 in <code>docker-compose.yml</code>.</p>
+
+<!-- UPDATE ──────────────────────────────────────────── -->
+<h1 id="update">9. Updating the Platform</h1>
+<p>When a new version of <code>index.html</code> is released, replace it using one of these methods:</p>
+
+<pre><span class="c"># Option A — Docker (zero-downtime hot swap)</span>
+docker cp platform/index.html wits_platform:/usr/share/nginx/html/index.html
+docker exec wits_platform nginx -s reload
+
+<span class="c"># Option A — Full rebuild (if Dockerfile changed)</span>
+cd docker && docker compose up -d --build
+
+<span class="c"># Option B — Bare nginx</span>
+sudo cp platform/index.html /var/www/wits-platform/index.html
+sudo nginx -s reload
+
+<span class="c"># Option C — Netlify CLI</span>
+netlify deploy --prod --dir ./platform
+
+<span class="c"># Option C — GitHub Pages (auto on push)</span>
+git add platform/index.html && git commit -m "Update platform" && git push
+
+<span class="c"># Using the deploy script</span>
+bash deploy.sh --update</pre>
+
+<!-- TROUBLESHOOT ────────────────────────────────────── -->
+<h1 id="troubleshoot">10. Troubleshooting</h1>
+<table>
+  <thead><tr><th>Error</th><th>Cause</th><th>Fix</th></tr></thead>
+  <tbody>
+    <tr><td>Sign-in screen loops / no navigation</td><td>JavaScript error on load</td><td>Open browser console (F12) — check for specific JS error. Clear site data: F12 → Application → Clear Storage.</td></tr>
+    <tr><td><code>too much recursion</code></td><td>Old v3 file — fixed in v4</td><td>Use <code>wits_platform_v4.html</code> (this package).</td></tr>
+    <tr><td>Port 80 already in use</td><td>Apache or another service running</td><td><code>sudo lsof -i :80</code> → stop conflicting service. Or change port in <code>docker-compose.yml</code>.</td></tr>
+    <tr><td>Container exits immediately</td><td>nginx config syntax error</td><td><code>docker logs wits_platform</code> → fix config → rebuild.</td></tr>
+    <tr><td>Google Fonts not loading</td><td>Strict CSP or no outbound internet</td><td>Platform degrades to system fonts — still fully functional. Relax CSP or self-host fonts.</td></tr>
+    <tr><td>Progress lost between sessions</td><td>Browser cleared localStorage, or different browser</td><td>localStorage is per-browser. Advise learners to use same browser consistently.</td></tr>
+    <tr><td>Admin panel not visible</td><td>Signed in as a learner, not admin</td><td>Sign out → sign in with <code>admin@wits.ac.za</code> / <code>WitsBISO@2025!</code></td></tr>
+    <tr><td>Certificate locked despite completing units</td><td>State not saved between sessions</td><td>Ensure pop-ups are not blocking localStorage. Check browser storage isn't in private/incognito mode.</td></tr>
+    <tr><td>Canvas iFrame blank</td><td>Domain not whitelisted in Canvas CSP</td><td>Canvas Admin → Security → Content Security Policy → add your domain.</td></tr>
+    <tr><td>SSL certificate fails</td><td>DNS not propagated yet</td><td>Wait 5–48 hours. Verify: <code>nslookup your-domain.wits.ac.za</code> → should show server IP.</td></tr>
+    <tr><td><code>docker: command not found</code></td><td>Docker not installed</td><td><code>curl -fsSL https://get.docker.com | bash</code></td></tr>
+    <tr><td><code>Permission denied</code> on deploy.sh</td><td>Script not executable</td><td><code>chmod +x deploy.sh</code></td></tr>
+  </tbody>
+</table>
+
+<br>
+<div style="background:var(--navy);color:rgba(255,255,255,.4);padding:22px 26px;border-radius:10px;font-size:12px;text-align:center;margin-top:40px">
+  <div style="color:#E8C96B;font-weight:600;margin-bottom:5px">Wits Data Literacy Platform v4 — Complete Deployment Guide</div>
+  University of the Witwatersrand · Business Intelligence Services · 2025<br>
+  Admin: admin@wits.ac.za · Password: WitsBISO@2025!
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+.env
+*.env.local
+/certs/
+/letsencrypt/
+*.log
+/logs/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

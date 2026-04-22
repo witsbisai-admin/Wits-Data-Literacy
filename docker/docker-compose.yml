@@ -1,0 +1,49 @@
+version: "3.9"
+
+# ═══════════════════════════════════════════════════════════════
+#  Wits Data Literacy Platform — Docker Compose
+#
+#  Start:   docker compose up -d --build
+#  Stop:    docker compose down
+#  Update:  docker compose up -d --build (rebuilds with new index.html)
+#  Logs:    docker compose logs -f
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  platform:
+    build:
+      context: ..                       # project root
+      dockerfile: docker/Dockerfile
+    container_name: wits_platform
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      # - "${HTTPS_PORT:-443}:443"      # Uncomment after SSL setup
+    volumes:
+      # Mount platform file so updates don't require image rebuild
+      - ../platform/index.html:/usr/share/nginx/html/index.html:ro
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - nginx_logs:/var/log/nginx
+      # - /etc/letsencrypt:/etc/letsencrypt:ro   # Uncomment for SSL
+    networks:
+      - wits_net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+networks:
+  wits_net:
+    driver: bridge
+
+volumes:
+  nginx_logs:
+    driver: local
